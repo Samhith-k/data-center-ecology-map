@@ -61,6 +61,8 @@ function Game({ username, onLogout }) {
   const [locationLoading, setLocationLoading] = useState(false);
   const [error, setError] = useState(null);
   const [notification, setNotification] = useState(null);
+  const [showFullDetails, setShowFullDetails] = useState(false);
+  const [recentlyViewedLocations, setRecentlyViewedLocations] = useState([]);
 
   // Building options with different specifications
   const buildingOptions = [
@@ -99,13 +101,22 @@ function Game({ username, onLogout }) {
       console.log("Starting fetch of potential locations...");
       const response = await fetch('http://localhost:8080/api/possible-datacenters', {
         method: 'GET',
-        credentials: 'include',
+        credentials: 'same-origin', // Change to 'same-origin' instead of 'include'
       });
       
       console.log("Response status:", response.status);
       
+      if (!response.ok) {
+        throw new Error(`Failed to fetch potential locations: ${response.status}`);
+      }
+      
       const rawData = await response.json();
       console.log("Potential locations received:", rawData);
+      
+      // Check if data is valid
+      if (!rawData || !Array.isArray(rawData)) {
+        throw new Error("Invalid data format received");
+      }
       
       // Transform the raw data to the format needed for the map
       const locations = rawData.map((dc, index) => ({
@@ -114,35 +125,58 @@ function Game({ username, onLogout }) {
           lat: dc.latitude, 
           lng: dc.longitude 
         },
-        isPotential: true // Flag to identify potential locations
+        isPotential: true
       }));
       
       setPotentialLocations(locations);
     } catch (err) {
       console.error("Error fetching potential locations:", err);
+      // Use fallback data
+      setPotentialLocations([
+        {
+          id: "potential-1",
+          position: { lat: 37.7749, lng: -122.4194 },
+          isPotential: true
+        },
+        {
+          id: "potential-2", 
+          position: { lat: 52.5200, lng: 13.4050 },
+          isPotential: true
+        },
+        {
+          id: "potential-3",
+          position: { lat: -33.8688, lng: 151.2093 },
+          isPotential: true
+        }
+      ]);
     }
   };
+  
 
   // Fetch available locations
   useEffect(() => {
     const fetchDataCenters = async () => {
-      try {
-        setIsLoading(true);
-        console.log("Fetching data centers...");
-        
-        // Get data from the backend
-        const response = await fetch('http://localhost:8080/alldatacenters', {
-          method: 'GET',
-          credentials: 'include',
-        });
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch data centers: ${response.status}`);
-        }
-        
-        const rawData = await response.json();
-        console.log("Data centers received:", rawData);
-        
+        try {
+          setIsLoading(true);
+          console.log("Fetching data centers...");
+          
+          const response = await fetch('http://localhost:8080/alldatacenters', {
+            method: 'GET',
+            credentials: 'same-origin', // Change to 'same-origin'
+          });
+          
+          if (!response.ok) {
+            throw new Error(`Failed to fetch data centers: ${response.status}`);
+          }
+          
+          const rawData = await response.json();
+          console.log("Data centers received:", rawData);
+          
+          // Check if data is valid
+          if (!rawData || !Array.isArray(rawData)) {
+            throw new Error("Invalid data format received");
+          }
+          
         // Transform the raw data to the format needed for the map
         const locations = rawData.map((dc, index) => ({
           id: index + 1,
@@ -236,15 +270,19 @@ function Game({ username, onLogout }) {
           console.error("Error parsing land price:", e);
         }
         
-        // Create details object from the API response
+        // Create details object from the API response with more fields
         const details = {
           name: propertyData.location_name || "Potential Location",
-          climate: Math.floor(Math.random() * 30) + 60, // Random climate score
-          renewable: Math.floor(Math.random() * 40) + 40, // Random renewable score
-          grid: Math.floor(Math.random() * 40) + 40, // Random grid score
-          risk: Math.floor(Math.random() * 20) + 70, // Random risk score
+          climate: Math.floor(Math.random() * 30) + 60,
+          renewable: Math.floor(Math.random() * 40) + 40,
+          grid: Math.floor(Math.random() * 40) + 40,
+          risk: Math.floor(Math.random() * 20) + 70,
           land_cost: landCost,
           electricity_cost: propertyData.electricity || "Unknown",
+          connectivity: propertyData.connectivity || "Standard",
+          water_availability: propertyData.water_availability || "Adequate",
+          tax_incentives: propertyData.tax_incentives || "None",
+          zone_type: propertyData.zone_type || "Industrial",
           description: propertyData.notes || "A potential location for a new data center."
         };
         
@@ -253,6 +291,15 @@ function Game({ username, onLogout }) {
           ...location,
           ...details
         };
+        
+        // Add the previously selected location to recently viewed
+        if (selectedLocation && selectedLocation.id !== location.id) {
+          setRecentlyViewedLocations(prev => {
+            // Only keep the last 3 viewed locations
+            const newList = [selectedLocation, ...prev.filter(loc => loc.id !== selectedLocation.id)].slice(0, 3);
+            return newList;
+          });
+        }
         
         setSelectedLocation(enrichedLocation);
       } else {
@@ -271,6 +318,15 @@ function Game({ username, onLogout }) {
           ...location,
           ...details
         };
+        
+        // Add the previously selected location to recently viewed
+        if (selectedLocation && selectedLocation.id !== location.id) {
+          setRecentlyViewedLocations(prev => {
+            // Only keep the last 3 viewed locations
+            const newList = [selectedLocation, ...prev.filter(loc => loc.id !== selectedLocation.id)].slice(0, 3);
+            return newList;
+          });
+        }
         
         setSelectedLocation(enrichedLocation);
       }
@@ -353,14 +409,6 @@ function Game({ username, onLogout }) {
       <div className="game-header">
         <div className="game-title">Data Center Tycoon</div>
         
-        {/* Add the user info and logout button here */}
-        <div className="user-controls">
-          <span className="username">Welcome, {username}!</span>
-          <button onClick={onLogout} className="logout-button">
-            Logout
-          </button>
-        </div>
-        
         <div className="game-stats">
           <div className="stat">
             <span className="stat-icon">💰</span>
@@ -385,6 +433,13 @@ function Game({ username, onLogout }) {
             <span className="stat-label">Day:</span>
             <span className="stat-value">{day}</span>
           </div>
+        </div>
+        
+        <div className="user-controls">
+          <span className="username">Welcome, {username}!</span>
+          <button onClick={onLogout} className="logout-button">
+            Logout
+          </button>
         </div>
       </div>
       
@@ -551,15 +606,113 @@ function Game({ username, onLogout }) {
                   </div>
                 </div>
                 
-                {selectedLocation.electricity_cost && (
-                  <div className="additional-info">
-                    <span className="info-label">Electricity Cost:</span>
-                    <span className="info-value">{selectedLocation.electricity_cost}</span>
-                  </div>
-                )}
-                
                 <p className="location-description">{selectedLocation.description}</p>
               </div>
+              
+              {/* Property Details Section - Add this after the Environmental Analysis section */}
+              {selectedLocation.isPotential && (
+                <div className="property-details">
+                  <h3>Property Details</h3>
+                  
+                  <div className="detail-item">
+                    <span className="detail-icon">🏢</span>
+                    <span className="detail-label">Location Name:</span>
+                    <span className="detail-value">{selectedLocation.name}</span>
+                  </div>
+                  
+                  {selectedLocation.electricity_cost && (
+                    <div className="detail-item">
+                      <span className="detail-icon">⚡</span>
+                      <span className="detail-label">Electricity Cost:</span>
+                      <span className="detail-value">{selectedLocation.electricity_cost}</span>
+                    </div>
+                  )}
+                  
+                  {selectedLocation.connectivity && (
+                    <div className="detail-item">
+                      <span className="detail-icon">🌐</span>
+                      <span className="detail-label">Network Connectivity:</span>
+                      <span className="detail-value">{selectedLocation.connectivity}</span>
+                    </div>
+                  )}
+                  
+                  <button 
+                    className="toggle-details-btn"
+                    onClick={() => setShowFullDetails(prev => !prev)}
+                  >
+                    {showFullDetails ? 'Show Less Details' : 'Show More Details'}
+                  </button>
+                  
+                  {showFullDetails && (
+                    <>
+                      {selectedLocation.water_availability && (
+                        <div className="detail-item">
+                          <span className="detail-icon">💧</span>
+                          <span className="detail-label">Water Availability:</span>
+                          <span className="detail-value">{selectedLocation.water_availability}</span>
+                        </div>
+                      )}
+                      
+                      {selectedLocation.tax_incentives && (
+                        <div className="detail-item">
+                          <span className="detail-icon">📋</span>
+                          <span className="detail-label">Tax Incentives:</span>
+                          <span className="detail-value">{selectedLocation.tax_incentives}</span>
+                        </div>
+                      )}
+                      
+                      {selectedLocation.zone_type && (
+                        <div className="detail-item">
+                          <span className="detail-icon">🏗️</span>
+                          <span className="detail-label">Zone Type:</span>
+                          <span className="detail-value">{selectedLocation.zone_type}</span>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+              )}
+              
+              {/* Location Comparison - Add this section */}
+              {recentlyViewedLocations.length > 0 && (
+                <div className="location-comparison">
+                  <h3>Location Comparison</h3>
+                  <div className="comparison-chart">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Location</th>
+                          <th>Climate</th>
+                          <th>Renewable</th>
+                          <th>Grid</th>
+                          <th>Risk</th>
+                          <th>Land Cost</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr className="current-location">
+                          <td>{selectedLocation.name}</td>
+                          <td>{selectedLocation.climate}%</td>
+                          <td>{selectedLocation.renewable}%</td>
+                          <td>{selectedLocation.grid}%</td>
+                          <td>{selectedLocation.risk}%</td>
+                          <td>${selectedLocation.land_cost.toLocaleString()}</td>
+                        </tr>
+                        {recentlyViewedLocations.map(location => (
+                          <tr key={location.id}>
+                            <td>{location.name}</td>
+                            <td>{location.climate}%</td>
+                            <td>{location.renewable}%</td>
+                            <td>{location.grid}%</td>
+                            <td>{location.risk}%</td>
+                            <td>${location.land_cost.toLocaleString()}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
               
               {/* Building Options */}
               <div className="building-options">

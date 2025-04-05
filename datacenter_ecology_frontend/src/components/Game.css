@@ -16,42 +16,53 @@
   .game-container {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
-    background-color: var(--bg-dark);
-    color: var(--text-light);
+    height: 100vh;
+    background-color: #f0f2f5;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
   
   /* Game Header */
   .game-header {
-    background-color: var(--bg-medium);
-    padding: 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    z-index: 10;
-    position: relative;
+    background-color: #2c3e50;
+    color: white;
   }
   
   .game-title {
     font-size: 1.5rem;
     font-weight: bold;
     color: var(--accent-color);
+    flex: 1;
+  }
+  
+  .game-stats {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex: 2;
+  }
+  
+  .stat {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
   }
   
   .user-controls {
     display: flex;
     align-items: center;
     gap: 1rem;
-    position: absolute;
-    top: 50%;
-    right: 1rem;
-    transform: translateY(-50%);
+    justify-content: flex-end;
+    flex: 1;
   }
+  
   
   .username {
     font-weight: 500;
     color: var(--text-light);
+    margin-right: 1rem;
   }
   
   .logout-button {
@@ -67,17 +78,6 @@
   
   .logout-button:hover {
     background-color: var(--secondary-color);
-  }
-  
-  .game-stats {
-    display: flex;
-    gap: 1.5rem;
-  }
-  
-  .stat {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
   }
   
   .stat-icon {
