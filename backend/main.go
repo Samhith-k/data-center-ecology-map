@@ -72,7 +72,6 @@ type DataCenter struct {
 	Longitude float64 `json:"longitude"`
 }
 
-// Define a struct for datacenter locations
 type DatacenterLocation struct {
 	Latitude    float64 `json:"latitude"`
 	Longitude   float64 `json:"longitude"`
@@ -82,20 +81,29 @@ type DatacenterLocation struct {
 	Notes       string  `json:"notes,omitempty"`
 }
 
+// Helper function to parse notes from the CSV format
+func parseNotes(notesStr string) string {
+	// Return as is - we'll let the client parse the JSON-like structure
+	return notesStr
+}
+
 // Helper function to read from CSV file
 func readDatacenterLocations() ([]DatacenterLocation, error) {
 	file, err := os.Open("us_possible_locations.csv")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to open CSV file: %w", err)
 	}
 	defer file.Close()
 
 	reader := csv.NewReader(file)
+	// Important: This allows the reader to handle fields with quotes and commas inside them
+	reader.LazyQuotes = true
+	reader.FieldsPerRecord = -1 // Allow variable number of fields
 
 	// Skip header
 	_, err = reader.Read()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to read CSV header: %w", err)
 	}
 
 	var locations []DatacenterLocation
@@ -105,26 +113,32 @@ func readDatacenterLocations() ([]DatacenterLocation, error) {
 			break
 		}
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("error reading CSV record: %w", err)
 		}
 
-		latitude, err := strconv.ParseFloat(record[0], 64)
-		if err != nil {
-			return nil, err
+		// Ensure we have at least 6 fields
+		if len(record) < 6 {
+			fmt.Printf("Warning: Skipping row with insufficient fields: %v\n", record)
+			continue
 		}
 
-		longitude, err := strconv.ParseFloat(record[1], 64)
+		latitude, err := strconv.ParseFloat(strings.TrimSpace(record[0]), 64)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("invalid latitude value: %s - %w", record[0], err)
+		}
+
+		longitude, err := strconv.ParseFloat(strings.TrimSpace(record[1]), 64)
+		if err != nil {
+			return nil, fmt.Errorf("invalid longitude value: %s - %w", record[1], err)
 		}
 
 		location := DatacenterLocation{
 			Latitude:    latitude,
 			Longitude:   longitude,
-			Name:        record[2],
-			LandPrice:   record[3],
-			Electricity: record[4],
-			Notes:       record[5],
+			Name:        strings.TrimSpace(record[2]),
+			LandPrice:   strings.TrimSpace(record[3]),
+			Electricity: strings.TrimSpace(record[4]),
+			Notes:       parseNotes(strings.TrimSpace(record[5])),
 		}
 
 		locations = append(locations, location)
@@ -156,6 +170,7 @@ func possibleDataCenterHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*") // Allow cross-origin requests
 	json.NewEncoder(w).Encode(response)
 }
 
@@ -219,6 +234,7 @@ func getPropertyDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "*") // Allow cross-origin requests
 	json.NewEncoder(w).Encode(response)
 }
 
