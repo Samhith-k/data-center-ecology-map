@@ -1,0 +1,213 @@
+data_center_name,latitude,longitude
+Equinix DC4 (Ashburn, VA),39.0191,-77.4660
+Equinix DC5 (Ashburn, VA),39.0220,-77.4639
+Digital Realty (21155 Smith Switch Rd, Ashburn, VA),39.0141,-77.4550
+STACK INFRASTRUCTURE (Ashburn, VA),39.0205,-77.4620
+Vantage Data Centers VA11 (Ashburn, VA),39.0232,-77.4637
+Compass Datacenters (Leesburg, VA),39.0936,-77.5589
+Aligned Energy (Ashburn, VA),39.0186,-77.4641
+CloudHQ (Ashburn, VA),39.0055,-77.4604
+PointOne Data Center (NOVA, VA),39.0146,-77.4559
+Sabey Data Centers (Ashburn, VA),39.0062,-77.4260
+Equinix DC6 (Chantilly, VA),38.8942,-77.4451
+Digital Realty (Chantilly, VA),38.9003,-77.4468
+CyrusOne (Sterling II, Sterling, VA),39.0013,-77.4230
+STACK INFRASTRUCTURE IAD02 (Sterling, VA),39.0075,-77.4172
+ServerFarm (Reston, VA),38.9609,-77.3571
+Vantage Data Centers VA12 (Sterling, VA),39.0028,-77.4225
+QTS (Manassas II, VA),38.7712,-77.5120
+EdgeConneX (Herndon, VA),38.9574,-77.3862
+Amazon AWS GovCloud (Herndon, VA),38.9601,-77.3887
+Microsoft (Arcola, VA),39.0002,-77.5600
+Digital Realty (120 E Van Buren St, Phoenix, AZ),33.4516,-112.0732
+NTT Global Data Centers (Mesa, AZ),33.3585,-111.6589
+Culmin Digital (Phoenix, AZ),33.4512,-112.0660
+H5 Data Centers (Chandler, AZ),33.3062,-111.8413
+Aligned Data Center (West Phoenix, AZ),33.4666,-112.0821
+EdgeCore Internet Real Estate (Mesa, AZ),33.3447,-111.6865
+Stack Infrastructure (Avondale, AZ),33.4357,-112.3480
+Cyxtera PHX2 (Tempe, AZ),33.4075,-111.9124
+Iron Mountain AZS-2 (Phoenix, AZ),33.4256,-112.0202
+AZRamp Data Center (Gilbert, AZ),33.3528,-111.7890
+DataBank MSP3 (Brooklyn Park, MN),45.0941,-93.3557
+TierPoint (Eagan, MN),44.8186,-93.1623
+CyrusOne (Chaska, MN),44.8468,-93.6005
+UScellular Data Center (Plymouth, MN),45.0105,-93.4555
+Peak 10 + ViaWest (Minneapolis, MN),44.9778,-93.2650
+Flexential MSP (Minneapolis, MN),44.9781,-93.2644
+Element Critical (Plymouth, MN),45.0150,-93.4826
+Involta (Duluth, MN),46.7832,-92.1066
+Stream Data Centers (Edina, MN),44.8881,-93.3530
+Onvoy (Golden Valley, MN),44.9910,-93.3553
+Equinix MI1 (Miami, FL),25.7752,-80.1892
+Cyxtera MIA1 (Doral, FL),25.8122,-80.3547
+NAP of the Americas (Miami, FL),25.7796,-80.1943
+Digital Realty (Miami, FL),25.7863,-80.2010
+vXchnge (Miami, FL),25.7753,-80.1947
+EdgeConneX (Miami, FL),25.7890,-80.2294
+ColoHouse (Miami, FL),25.7723,-80.1945
+QTS (Coral Springs, FL),26.2712,-80.2706
+HostDime (Jacksonville, FL),30.3322,-81.6557
+Peak 10 + ViaWest (Tampa, FL),27.9661,-82.4526
+Flexential (Plano, TX),33.0535,-96.7413
+STACK INFRASTRUCTURE (Plano, TX),33.0508,-96.7698
+Stream Data Centers (Plano, TX),33.0451,-96.7331
+Alkira Data Center (Dallas, TX),32.7791,-96.8081
+Compass Datacenters (Red Oak, TX),32.5193,-96.8042
+TierPoint (Allen, TX),33.1032,-96.6706
+Cologix DAL3 (Dallas, TX),32.8004,-96.7918
+QTS Fort Worth (Fort Worth, TX),32.7277,-97.3215
+zColo DFW (Dallas, TX),32.8028,-96.8016
+Digital Realty (Richardson, TX),32.9716,-96.6985
+Cyxtera BOS1 (Boston, MA),42.3603,-71.0583
+Iron Mountain (Waltham, MA),42.3765,-71.2356
+Markley Group (1 Summer St, Boston, MA),42.3514,-71.0609
+Equinix BO1 (Boston, MA),42.3499,-71.0592
+Digital Realty (Bedford, MA),42.4975,-71.2757
+ColoSpace (Somerville, MA),42.3876,-71.0995
+Lightower (Burlington, MA),42.5049,-71.1956
+INAP (Boston, MA),42.3585,-71.0567
+Verizon Enterprise (Needham, MA),42.2809,-71.2376
+Cervalis (Norwood, MA),42.1884,-71.1995
+Cyxtera SEA1 (Seattle, WA),47.6062,-122.3321
+Amazon US-West-2 (Seattle, WA),47.6235,-122.3365
+Microsoft Azure (West US, Quincy, WA),47.2349,-119.8529
+Sabey Data Centers (Seattle, WA),47.5943,-122.3343
+Digital Realty (Seattle, WA),47.5988,-122.3312
+H5 Data Centers (Seattle, WA),47.6021,-122.3365
+EdgeConneX (Seattle, WA),47.6108,-122.3377
+TierPoint (Spokane, WA),47.6588,-117.4260
+Comcast Data Center (Tacoma, WA),47.2529,-122.4443
+ColoCrossing (Seattle, WA),47.6080,-122.3379
+DataBank DEN2 (Englewood, CO),39.6425,-104.9872
+CoreSite DE2 (Denver, CO),39.7477,-105.0000
+STACK INFRASTRUCTURE DEN01 (Denver, CO),39.7533,-104.9973
+Iron Mountain (Denver, CO),39.7563,-105.0010
+Cyxtera DEN3 (Denver, CO),39.7515,-104.9982
+Flexential (Aurora, CO),39.7294,-104.8319
+Aligned Denver (Englewood, CO),39.6421,-104.9901
+EdgeConneX (Denver, CO),39.7578,-105.0072
+Vantage Data Centers (Aurora, CO),39.7201,-104.8198
+T5 Data Centers (Colorado Springs, CO),38.8339,-104.8214
+Digital Realty (113 N Myers St, Charlotte, NC),35.2272,-80.8397
+Flexential (Raleigh, NC),35.7796,-78.6400
+CloudInspire (Durham, NC),35.9940,-78.8986
+EdgeConneX (Charlotte, NC),35.2382,-80.8000
+TierPoint (Charlotte II, NC),35.2119,-80.8421
+GigaData Center (Mooresville, NC),35.5849,-80.8101
+Cologix (Columbia, SC),34.0007,-81.0348
+Bluebird Network (Chester, SC),34.7057,-81.2147
+Immedion (Greenville, SC),34.8526,-82.3940
+Green Cloud Technologies (Greenville, SC),34.8563,-82.3984
+data_center_name,latitude,longitude
+Equinix DC1 (Ashburn, VA),39.0153,-77.4602
+Digital Realty Ashburn (Building A),39.0142,-77.4637
+CoreSite VA1 (Reston, VA),38.9628,-77.3593
+CyrusOne Sterling I (Sterling, VA),39.0065,-77.4264
+Iron Mountain (Manassas, VA),38.7737,-77.5163
+QTS Ashburn (Ashburn, VA),39.0159,-77.4600
+Equinix DC2 (Ashburn, VA),39.0164,-77.4591
+Digital Realty (21715 Filigree Ct, Ashburn, VA),39.0147,-77.4527
+Lumen Ashburn (Ashburn, VA),39.0312,-77.4695
+Amazon IAD Facility (Ashburn, VA),39.0469,-77.4903
+Equinix DC3 (Ashburn, VA),39.0168,-77.4632
+Switch SUPERNAP (Las Vegas, NV),36.0611,-115.1711
+ViaWest (Las Vegas, NV),36.1091,-115.2242
+Flexential Las Vegas (Las Vegas, NV),36.0795,-115.1707
+Cologix MIN3 (Minneapolis, MN),44.9788,-93.2729
+Stream Data Centers (Chaska, MN),44.8439,-93.6002
+DataBank MSP2 (Eagan, MN),44.8209,-93.1650
+QTS Atlanta-Metro (Atlanta, GA),33.7877,-84.4097
+Digital Realty (56 Marietta, Atlanta, GA),33.7564,-84.3915
+Cyber Wurx (55 Marietta, Atlanta, GA),33.7562,-84.3913
+Equinix AT1 (Atlanta, GA),33.7580,-84.3882
+Switch ATLANTA (Atlanta, GA),33.8894,-84.4340
+DataBank ATL1 (Atlanta, GA),33.7859,-84.3968
+NTT Global Data Centers (Douglasville, GA),33.7458,-84.7498
+Digital Realty (350 E Cermak, Chicago, IL),41.8546,-87.6183
+CyrusOne Chicago (Aurora, IL),41.7638,-88.3201
+Equinix CH3 (Elk Grove Village, IL),42.0129,-87.9972
+CoreSite CH1 (Chicago, IL),41.8623,-87.6312
+QTS Chicago (Chicago, IL),41.8406,-87.6240
+Element Critical (Wood Dale, IL),41.9723,-87.9833
+Aligned Data Centers (West Chicago, IL),41.8875,-88.2008
+Evoque Data Center (Oak Brook, IL),41.8514,-87.9422
+Digital Realty (9333 Grand Ave, Franklin Park, IL),41.9294,-87.8653
+Cyxtera CH2 (Chicago, IL),41.8874,-87.6316
+Equinix LA1 (Los Angeles, CA),34.0489,-118.2578
+Equinix LA3 (El Segundo, CA),33.9278,-118.3823
+CoreSite LA1 (Los Angeles, CA),34.0487,-118.2575
+Digital Realty (600 W 7th St, Los Angeles, CA),34.0482,-118.2550
+Coresite LA2 (Los Angeles, CA),34.0485,-118.2559
+Iron Mountain (Downtown LA, CA),34.0429,-118.2451
+Cyxtera LAX1 (Torrance, CA),33.8523,-118.3287
+Digital Realty (1 Wilshire, Los Angeles, CA),34.0477,-118.2572
+Equinix SV1 (San Jose, CA),37.3689,-121.9291
+Digital Realty (1100 Space Park, Santa Clara, CA),37.3772,-121.9726
+Vantage Data Centers (Santa Clara, CA),37.3842,-121.9750
+Cyxtera SFO2 (Santa Clara, CA),37.3734,-121.9644
+Equinix SV2 (Santa Clara, CA),37.3739,-121.9741
+Digital Realty (720 2nd St, Oakland, CA),37.7943,-122.2758
+NTT Global Data Centers (Santa Clara, CA),37.3786,-121.9699
+CoreSite SV1 (San Jose, CA),37.3382,-121.8863
+Digital Realty (2323 Bryan St, Dallas, TX),32.7868,-96.7932
+Equinix DA1 (Dallas, TX),32.8065,-96.8191
+Digital Realty (Dallas, TX – 8435 N Stemmons Fwy),32.8177,-96.8797
+CyrusOne (Carrollton, TX),32.9682,-96.8985
+QTS Dallas-Fort Worth (Irving, TX),32.8892,-96.9238
+Stream Data Centers (Garland, TX),32.9134,-96.6305
+Facebook/Meta Data Center (Fort Worth, TX),32.9888,-97.4577
+Google Data Center (Midlothian, TX),32.4950,-96.9595
+Aligned Dallas (Plano, TX),33.0412,-96.7275
+NTT Global Data Centers (Dallas, TX),32.9359,-96.8359
+CyrusOne (Mesa, AZ),33.3515,-111.6729
+Digital Realty (Phoenix, AZ),33.4602,-112.0677
+Aligned Phoenix (Phoenix, AZ),33.4223,-112.0265
+Iron Mountain (Phoenix, AZ),33.4211,-112.0217
+Cyxtera PHX1 (Tempe, AZ),33.4159,-111.9093
+H5 Data Centers (Phoenix, AZ),33.4496,-112.0013
+Compass Datacenters (Goodyear, AZ),33.4356,-112.3577
+Microsoft West US 2 (West Valley, AZ),33.5282,-112.2176
+Google Data Center (Council Bluffs, IA),41.2628,-95.8608
+Facebook/Meta Data Center (Altoona, IA),41.6581,-93.4757
+LightEdge (Altoona, IA),41.6628,-93.4697
+QTS (Princeton, NJ),40.3752,-74.5983
+Digital Realty (Piscataway, NJ),40.5453,-74.4630
+Equinix NY4 (Secaucus, NJ),40.7892,-74.0613
+DataBank (EWR1, Piscataway, NJ),40.5516,-74.4606
+Cologix NNJ2 (Parsippany, NJ),40.8650,-74.4253
+CoreSite NY1 (New York, NY),40.7217,-74.0049
+Digital Realty (111 8th Ave, NYC),40.7401,-74.0018
+Telehouse (85 10th Ave, NYC),40.7423,-74.0060
+Equinix NY2 (Secaucus, NJ),40.7856,-74.0634
+QTS New York (Jersey City, NJ),40.7273,-74.0770
+Equinix NY5 (Secaucus, NJ),40.7875,-74.0630
+zColo (60 Hudson St, NYC),40.7172,-74.0084
+Flexential (Tampa, FL),27.9540,-82.4572
+vXchnge (Tampa, FL),27.9620,-82.4516
+HostDime (Orlando, FL),28.5383,-81.3792
+Switch (Grand Rapids, MI),42.9090,-85.7050
+Liquid Web (Lansing, MI),42.7325,-84.5555
+Rackspace (Windcrest, TX),29.5117,-98.3852
+Flexential (Charlotte, NC),35.2271,-80.8431
+TierPoint (Raleigh, NC),35.7796,-78.6382
+Amazon US-East (Boardman, OR),45.8399,-119.7006
+Microsoft (Quincy, WA),47.2348,-119.8525
+Yahoo (Lockport, NY),43.1704,-78.6951
+Google Data Center (Lenoir, NC),35.9338,-81.5386
+Apple Data Center (Maiden, NC),35.5769,-81.2135
+Facebook/Meta (Forest City, NC),35.3119,-81.8692
+IBM Cloud (Dallas, TX),32.7767,-96.7970
+Oracle Cloud (Ashburn, VA),39.0300,-77.4708
+EdgeConneX (Denver, CO),39.7348,-104.9935
+DataBank (DEN1, Denver, CO),39.7532,-104.9916
+Flexential (Englewood, CO),39.6478,-104.9878
+Cologix DEN2 (Denver, CO),39.7511,-104.9995
+H5 Data Centers (Denver, CO),39.7595,-105.0001
+Amazon US-West (Umatilla, OR),45.9182,-119.3249
+EdgeConneX (Portland, OR),45.5230,-122.6762
+Aligned Data Centers (Salt Lake City, UT),40.7764,-111.9902
+eBay Data Center (Salt Lake City, UT),40.7670,-111.9800
+NSA Data Center (Bluffdale, UT),40.4563,-111.9170
+Digital Realty (Hillsboro, OR),45.5313,-122.9365
+
