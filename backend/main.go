@@ -3,10 +3,13 @@ package main
 import (
 	"bufio"
 	"crypto/rand"
+	"encoding/csv"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
+	"math"
 	"net/http"
 	"os"
 	"strconv"
@@ -46,6 +49,8 @@ func main() {
 	http.HandleFunc("/profile", profileHandler)
 	http.HandleFunc("/logout", logoutHandler)
 	http.HandleFunc("/alldatacenters", allDataCentersHandler)
+	http.HandleFunc("/api/possible-datacenters", possibleDataCenterHandler)
+	http.HandleFunc("/api/property-details", getPropertyDetailsHandler)
 	// http.HandleFunc("/logout", logoutHandler)
 
 	// If you build your React app into ./frontend/build, you can serve it:
@@ -65,6 +70,156 @@ type DataCenter struct {
 	Name      string  `json:"name"`
 	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
+}
+
+// Define a struct for datacenter locations
+type DatacenterLocation struct {
+	Latitude    float64 `json:"latitude"`
+	Longitude   float64 `json:"longitude"`
+	Name        string  `json:"name,omitempty"`
+	LandPrice   string  `json:"land_price,omitempty"`
+	Electricity string  `json:"electricity,omitempty"`
+	Notes       string  `json:"notes,omitempty"`
+}
+
+// Helper function to read from CSV file
+func readDatacenterLocations() ([]DatacenterLocation, error) {
+	file, err := os.Open("us_possible_locations.csv")
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	reader := csv.NewReader(file)
+
+	// Skip header
+	_, err = reader.Read()
+	if err != nil {
+		return nil, err
+	}
+
+	var locations []DatacenterLocation
+	for {
+		record, err := reader.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+
+		latitude, err := strconv.ParseFloat(record[0], 64)
+		if err != nil {
+			return nil, err
+		}
+
+		longitude, err := strconv.ParseFloat(record[1], 64)
+		if err != nil {
+			return nil, err
+		}
+
+		location := DatacenterLocation{
+			Latitude:    latitude,
+			Longitude:   longitude,
+			Name:        record[2],
+			LandPrice:   record[3],
+			Electricity: record[4],
+			Notes:       record[5],
+		}
+
+		locations = append(locations, location)
+	}
+
+	return locations, nil
+}
+
+// Handler for getting all possible datacenter locations
+func possibleDataCenterHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	locations, err := readDatacenterLocations()
+	if err != nil {
+		http.Error(w, "Error reading datacenter locations: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Create a simplified response with only lat/long
+	var response []map[string]float64
+	for _, loc := range locations {
+		response = append(response, map[string]float64{
+			"latitude":  loc.Latitude,
+			"longitude": loc.Longitude,
+		})
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
+}
+
+// Handler for getting property details based on lat/long
+func getPropertyDetailsHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	// Parse latitude and longitude from query parameters
+	latStr := r.URL.Query().Get("lat")
+	lngStr := r.URL.Query().Get("lng")
+
+	if latStr == "" || lngStr == "" {
+		http.Error(w, "Missing latitude or longitude parameters", http.StatusBadRequest)
+		return
+	}
+
+	lat, err := strconv.ParseFloat(latStr, 64)
+	if err != nil {
+		http.Error(w, "Invalid latitude format", http.StatusBadRequest)
+		return
+	}
+
+	lng, err := strconv.ParseFloat(lngStr, 64)
+	if err != nil {
+		http.Error(w, "Invalid longitude format", http.StatusBadRequest)
+		return
+	}
+
+	// Define a small epsilon for floating-point comparison
+	const epsilon = 0.0001
+
+	locations, err := readDatacenterLocations()
+	if err != nil {
+		http.Error(w, "Error reading datacenter locations: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	// Find the matching location
+	var matchedLocation *DatacenterLocation
+	for _, loc := range locations {
+		if math.Abs(loc.Latitude-lat) < epsilon && math.Abs(loc.Longitude-lng) < epsilon {
+			matchedLocation = &loc
+			break
+		}
+	}
+
+	if matchedLocation == nil {
+		http.Error(w, "No property found at the specified coordinates", http.StatusNotFound)
+		return
+	}
+
+	// Return all details except lat/long
+	response := map[string]string{
+		"location_name": matchedLocation.Name,
+		"land_price":    matchedLocation.LandPrice,
+		"electricity":   matchedLocation.Electricity,
+		"notes":         matchedLocation.Notes,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(response)
 }
 
 func allDataCentersHandler(w http.ResponseWriter, r *http.Request) {
