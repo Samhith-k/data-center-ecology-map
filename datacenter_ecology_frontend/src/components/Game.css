@@ -516,3 +516,23 @@
   .purple-dot {
     background-color: #9C2BCB;
   }
+
+  .orange-dot {
+    background-color: #FF8C00;
+  }
+  
+  .additional-info {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px dashed var(--bg-medium);
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .info-label {
+    color: var(--text-muted);
+  }
+  
+  .info-value {
+    font-weight: bold;
+  }

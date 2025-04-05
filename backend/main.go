@@ -149,6 +149,18 @@ func readDatacenterLocations() ([]DatacenterLocation, error) {
 
 // Handler for getting all possible datacenter locations
 func possibleDataCenterHandler(w http.ResponseWriter, r *http.Request) {
+    // Add CORS headers - match the same pattern as your other handlers
+    w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+    w.Header().Set("Access-Control-Allow-Credentials", "true")
+    w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
+    w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+    // Handle preflight requests
+    if r.Method == http.MethodOptions {
+        w.WriteHeader(http.StatusOK)
+        return
+    }
+
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -170,12 +182,23 @@ func possibleDataCenterHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*") // Allow cross-origin requests
 	json.NewEncoder(w).Encode(response)
 }
 
 // Handler for getting property details based on lat/long
 func getPropertyDetailsHandler(w http.ResponseWriter, r *http.Request) {
+    // Add CORS headers - match the same pattern as your other handlers
+    w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+    w.Header().Set("Access-Control-Allow-Credentials", "true")
+    w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
+    w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+
+    // Handle preflight requests
+    if r.Method == http.MethodOptions {
+        w.WriteHeader(http.StatusOK)
+        return
+    }
+
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
@@ -234,7 +257,6 @@ func getPropertyDetailsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*") // Allow cross-origin requests
 	json.NewEncoder(w).Encode(response)
 }
 

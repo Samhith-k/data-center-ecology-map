@@ -16,31 +16,41 @@ L.Icon.Default.mergeOptions({
 
 // Custom marker icons
 const availableIcon = new L.DivIcon({
-    className: 'custom-map-marker',
-    html: `<div class="map-dot blue-dot"></div>`,
-    iconSize: [14, 14],
-    iconAnchor: [7, 7],
-    popupAnchor: [0, -7]
-  });
-  
-  const selectedIcon = new L.DivIcon({
-    className: 'custom-map-marker',
-    html: `<div class="map-dot green-dot"></div>`,
-    iconSize: [14, 14],
-    iconAnchor: [7, 7],
-    popupAnchor: [0, -7]
-  });
-  
-  const builtIcon = new L.DivIcon({
-    className: 'custom-map-marker',
-    html: `<div class="map-dot purple-dot"></div>`,
-    iconSize: [14, 14],
-    iconAnchor: [7, 7],
-    popupAnchor: [0, -7]
-  });
+  className: 'custom-map-marker',
+  html: `<div class="map-dot blue-dot"></div>`,
+  iconSize: [14, 14],
+  iconAnchor: [7, 7],
+  popupAnchor: [0, -7]
+});
+
+const selectedIcon = new L.DivIcon({
+  className: 'custom-map-marker',
+  html: `<div class="map-dot green-dot"></div>`,
+  iconSize: [14, 14],
+  iconAnchor: [7, 7],
+  popupAnchor: [0, -7]
+});
+
+const builtIcon = new L.DivIcon({
+  className: 'custom-map-marker',
+  html: `<div class="map-dot purple-dot"></div>`,
+  iconSize: [14, 14],
+  iconAnchor: [7, 7],
+  popupAnchor: [0, -7]
+});
+
+// New icon for potential data center locations
+const potentialLocationIcon = new L.DivIcon({
+  className: 'custom-map-marker',
+  html: `<div class="map-dot orange-dot"></div>`,
+  iconSize: [14, 14],
+  iconAnchor: [7, 7],
+  popupAnchor: [0, -7]
+});
 
 function Game({ username, onLogout }) {
   const [availableLocations, setAvailableLocations] = useState([]);
+  const [potentialLocations, setPotentialLocations] = useState([]); // New state for potential locations
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [builtDataCenters, setBuiltDataCenters] = useState([]);
   const [budget, setBudget] = useState(10000000);
@@ -82,6 +92,36 @@ function Game({ username, onLogout }) {
       description: 'Cutting-edge facility with advanced liquid cooling, on-site renewables, and intelligent power management.'
     }
   ];
+
+  // Fetch potential data center locations
+  const fetchPotentialLocations = async () => {
+    try {
+      console.log("Starting fetch of potential locations...");
+      const response = await fetch('http://localhost:8080/api/possible-datacenters', {
+        method: 'GET',
+        credentials: 'include',
+      });
+      
+      console.log("Response status:", response.status);
+      
+      const rawData = await response.json();
+      console.log("Potential locations received:", rawData);
+      
+      // Transform the raw data to the format needed for the map
+      const locations = rawData.map((dc, index) => ({
+        id: `potential-${index + 1}`,
+        position: { 
+          lat: dc.latitude, 
+          lng: dc.longitude 
+        },
+        isPotential: true // Flag to identify potential locations
+      }));
+      
+      setPotentialLocations(locations);
+    } catch (err) {
+      console.error("Error fetching potential locations:", err);
+    }
+  };
 
   // Fetch available locations
   useEffect(() => {
@@ -152,6 +192,7 @@ function Game({ username, onLogout }) {
     };
 
     fetchDataCenters();
+    fetchPotentialLocations(); // Fetch potential locations
   }, []);
 
   // Calculate total environmental score for a location
@@ -165,24 +206,75 @@ function Game({ username, onLogout }) {
     try {
       setLocationLoading(true);
       
-      // Generate random environmental data for the location
-      // In a real app, you would fetch this from the backend
-      const details = {
-        climate: Math.floor(Math.random() * 30) + 60, // Random value between 60-90
-        renewable: Math.floor(Math.random() * 40) + 40, // Random value between 40-80
-        grid: Math.floor(Math.random() * 40) + 40, // Random value between 40-80
-        risk: Math.floor(Math.random() * 20) + 70, // Random value between 70-90
-        land_cost: Math.floor(Math.random() * 3000000) + 2000000, // Random cost
-        description: `Data center located in ${location.name} with excellent connectivity to major networks.`
-      };
+      if (location.isPotential) {
+        // This is a potential location, fetch details from property-details endpoint
+        console.log("Fetching property details for:", location);
+        const response = await fetch(
+          `http://localhost:8080/api/property-details?lat=${location.position.lat}&lng=${location.position.lng}`,
+          {
+            method: 'GET',
+            credentials: 'include',
+          }
+        );
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch property details: ${response.status}`);
+        }
+        
+        const propertyData = await response.json();
+        console.log("Property details:", propertyData);
+        
+        // Parse land price to extract numeric value
+        let landCost = 3000000; // Default fallback
+        try {
+          const priceText = propertyData.land_price || "";
+          const priceMatch = priceText.match(/\$([0-9,]+)/);
+          if (priceMatch && priceMatch[1]) {
+            landCost = parseInt(priceMatch[1].replace(/,/g, ''));
+          }
+        } catch (e) {
+          console.error("Error parsing land price:", e);
+        }
+        
+        // Create details object from the API response
+        const details = {
+          name: propertyData.location_name || "Potential Location",
+          climate: Math.floor(Math.random() * 30) + 60, // Random climate score
+          renewable: Math.floor(Math.random() * 40) + 40, // Random renewable score
+          grid: Math.floor(Math.random() * 40) + 40, // Random grid score
+          risk: Math.floor(Math.random() * 20) + 70, // Random risk score
+          land_cost: landCost,
+          electricity_cost: propertyData.electricity || "Unknown",
+          description: propertyData.notes || "A potential location for a new data center."
+        };
+        
+        // Create enriched location object
+        const enrichedLocation = {
+          ...location,
+          ...details
+        };
+        
+        setSelectedLocation(enrichedLocation);
+      } else {
+        // Regular existing location, generate metrics as before
+        const details = {
+          climate: Math.floor(Math.random() * 30) + 60, // Random value between 60-90
+          renewable: Math.floor(Math.random() * 40) + 40, // Random value between 40-80
+          grid: Math.floor(Math.random() * 40) + 40, // Random value between 40-80
+          risk: Math.floor(Math.random() * 20) + 70, // Random value between 70-90
+          land_cost: Math.floor(Math.random() * 3000000) + 2000000, // Random cost
+          description: `Data center located in ${location.name} with excellent connectivity to major networks.`
+        };
+        
+        // Create a complete location object with the generated details
+        const enrichedLocation = {
+          ...location,
+          ...details
+        };
+        
+        setSelectedLocation(enrichedLocation);
+      }
       
-      // Create a complete location object with the generated details
-      const enrichedLocation = {
-        ...location,
-        ...details
-      };
-      
-      setSelectedLocation(enrichedLocation);
       setNotification(null);
       setLocationLoading(false);
     } catch (error) {
@@ -340,6 +432,34 @@ function Game({ username, onLogout }) {
               return null;
             })}
             
+            {/* Potential Locations */}
+            {potentialLocations.map(location => {
+              const isSelected = selectedLocation && selectedLocation.id === location.id;
+              
+              return (
+                <Marker 
+                  key={location.id} 
+                  position={[location.position.lat, location.position.lng]}
+                  icon={isSelected ? selectedIcon : potentialLocationIcon}
+                  eventHandlers={{
+                    click: () => handleLocationSelect(location)
+                  }}
+                >
+                  <Popup>
+                    <div>
+                      <h3>Potential Location</h3>
+                      <button 
+                        className="map-select-btn"
+                        onClick={() => handleLocationSelect(location)}
+                      >
+                        View Details
+                      </button>
+                    </div>
+                  </Popup>
+                </Marker>
+              );
+            })}
+            
             {/* Built Data Centers */}
             {builtDataCenters.map(dataCenter => (
               <Marker 
@@ -430,6 +550,13 @@ function Game({ username, onLogout }) {
                     <span className="cost">${selectedLocation.land_cost.toLocaleString()}</span>
                   </div>
                 </div>
+                
+                {selectedLocation.electricity_cost && (
+                  <div className="additional-info">
+                    <span className="info-label">Electricity Cost:</span>
+                    <span className="info-value">{selectedLocation.electricity_cost}</span>
+                  </div>
+                )}
                 
                 <p className="location-description">{selectedLocation.description}</p>
               </div>
