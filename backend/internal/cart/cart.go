@@ -18,11 +18,13 @@ var (
 	cartDir = "./carts" // directory where cart files are stored
 )
 
+type CartItem = data.DatacenterLocation
+
 // Cart represents a user's shopping cart.
 type Cart struct {
-	Username  string                    `json:"username"`
-	Items     []data.DatacenterLocation `json:"items"`
-	MoneyLeft float64                   `json:"money_left"`
+	Username  string     `json:"username"`
+	Items     []CartItem `json:"items"`
+	MoneyLeft float64    `json:"money_left"`
 }
 
 // LoadAllCarts loads all cart files from disk when the app starts.

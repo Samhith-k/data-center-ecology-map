@@ -34,6 +34,7 @@ func main() {
 			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		}
 	})
+	http.HandleFunc("/api/simulation", handlers.GetUserClimateSimulationHandler)
 
 	fmt.Println("Starting server on :8080 ...")
 	log.Fatal(http.ListenAndServe(":8080", nil))
