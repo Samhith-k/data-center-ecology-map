@@ -1,0 +1,38 @@
+{
+  "username": "q",
+  "items": [
+    {
+      "latitude": 36.9685,
+      "longitude": -86.4808,
+      "name": "Bowling Green, KY",
+      "land_price": "$50,000",
+      "electricity": "$0.0870/kWh",
+      "notes": "{notes:[\"Western Kentucky"
+    },
+    {
+      "latitude": 42.75,
+      "longitude": -105.3822,
+      "name": "Douglas, WY",
+      "land_price": "$30,000",
+      "electricity": "$0.0679/kWh",
+      "notes": "{notes:[\"Eastern Wyoming"
+    },
+    {
+      "latitude": 41.5583,
+      "longitude": -73.0389,
+      "name": "Waterbury, CT",
+      "land_price": "$120,000",
+      "electricity": "$0.1736/kWh",
+      "notes": "{notes:[\"Central Connecticut"
+    },
+    {
+      "latitude": 40.3752,
+      "longitude": -74.5983,
+      "name": "Princeton, NJ",
+      "land_price": "$400,000",
+      "electricity": "$0.1267/kWh",
+      "notes": "{notes:[\"QTS presence"
+    }
+  ],
+  "money_left": 400000
+}

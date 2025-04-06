@@ -2,37 +2,69 @@
   "username": "sam",
   "items": [
     {
-      "latitude": 42.9634,
-      "longitude": -85.6681,
-      "name": "Grand Rapids, MI",
+      "latitude": 33.4918,
+      "longitude": -80.8556,
+      "name": "Orangeburg, SC",
+      "land_price": "$30,000",
+      "electricity": "$0.0904/kWh",
+      "notes": "{notes:[\"Central SC"
+    },
+    {
+      "latitude": 40.8158,
+      "longitude": -96.7127,
+      "name": "Lincoln (Downtown), NE",
+      "land_price": "$80,000",
+      "electricity": "$0.0870/kWh",
+      "notes": "{notes:[\"State government"
+    },
+    {
+      "latitude": 43.1572,
+      "longitude": -77.6152,
+      "name": "Rochester, NY",
       "land_price": "$100,000",
-      "electricity": "$0.1115/kWh",
-      "notes": "{notes:[\"Switch presence"
+      "electricity": "$0.1460/kWh",
+      "notes": "{notes:[\"Western NY"
     },
     {
-      "latitude": 32.495,
-      "longitude": -96.9595,
-      "name": "Midlothian, TX",
-      "land_price": "$120,000",
-      "electricity": "$0.0813/kWh",
-      "notes": "{notes:[\"Google Data Center presence"
+      "latitude": 45.9182,
+      "longitude": -119.3249,
+      "name": "Umatilla, OR",
+      "land_price": "$50,000",
+      "electricity": "$0.0801/kWh",
+      "notes": "{notes:[\"Amazon US-West presence"
     },
     {
-      "latitude": 45.4647,
-      "longitude": -98.4864,
-      "name": "Aberdeen, SD",
+      "latitude": 37.8043,
+      "longitude": -81.1895,
+      "name": "Beckley, WV",
       "land_price": "$30,000",
-      "electricity": "$0.0894/kWh",
-      "notes": "{notes:[\"Northeastern SD"
+      "electricity": "$0.0858/kWh",
+      "notes": "{notes:[\"Southern WV"
     },
     {
-      "latitude": 45.4647,
-      "longitude": -98.4864,
-      "name": "Aberdeen, SD",
+      "latitude": 33.4918,
+      "longitude": -80.8556,
+      "name": "Orangeburg, SC",
       "land_price": "$30,000",
+      "electricity": "$0.0904/kWh",
+      "notes": "{notes:[\"Central SC"
+    },
+    {
+      "latitude": 44.3683,
+      "longitude": -98.2186,
+      "name": "Huron, SD",
+      "land_price": "$25,000",
       "electricity": "$0.0894/kWh",
-      "notes": "{notes:[\"Northeastern SD"
+      "notes": "{notes:[\"Central SD"
+    },
+    {
+      "latitude": 43.5726,
+      "longitude": -72.2387,
+      "name": "Lebanon, NH",
+      "land_price": "$100,000",
+      "electricity": "$0.1729/kWh",
+      "notes": "{notes:[\"Dartmouth College"
     }
   ],
-  "money_left": 720000
+  "money_left": 555000
 }
