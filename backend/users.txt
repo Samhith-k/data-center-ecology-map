@@ -2,3 +2,6 @@ alice:$2a$10$3ntFQ2z1Z0ktodGToV8QVOaabbKr/cIVPkwpHiPn0ZwnBwcL.9xRy
 bob:$2a$10$dZTLPL24ZWmpMd2/tGykM.hGMpZPAcb/hD/buh6ztTv4Vn0T4Lq1u
 testuser:$2a$10$zxm/9vQ2I6CDIGqFtMFMX.WGFcyrAlb5eGTJHSK5xbyKJvAq0gZtm
 bharath:$2a$10$5puOeKBedP0n.QLiyNumeu7TofmHyfz2csyCJplXZPTrQy0o3bY8.
+s:$2a$10$b41Jp3dOAyyZ6V1PDLDjY.h6lD2IJzBPP0nkRixr79qAQI6tAZVVi
+a:$2a$10$ych7utGZ1fDS1o.LJVKcROjFze/.ZRdb1oJzSBEm3ywvnj5chMf16
+sam:$2a$10$B/iIDH1p8PSCGgvppi5TC.GLmh9cDqGYvU3PeleAQQ4MfTiO3d1DC

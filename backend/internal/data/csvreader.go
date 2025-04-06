@@ -18,21 +18,49 @@ func ReadAllDataCenters(filename string) ([]DataCenter, error) {
 	}
 	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
-	var dataCenters []DataCenter
-	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
-		if line == "" {
-			continue
-		}
-		dc, parseErr := parseDataCenterLine(line)
-		if parseErr != nil {
-			continue
-		}
-		dataCenters = append(dataCenters, *dc)
+	reader := csv.NewReader(file)
+	// Optionally, allow lazy quotes if your CSV has some formatting issues:
+	reader.LazyQuotes = true
+
+	// Read the header row
+	if _, err := reader.Read(); err != nil {
+		return nil, fmt.Errorf("failed to read CSV header: %v", err)
 	}
-	if err := scanner.Err(); err != nil {
-		return nil, err
+
+	var dataCenters []DataCenter
+	for {
+		record, err := reader.Read()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			fmt.Printf("Skipping record due to error: %v\n", err)
+			continue
+		}
+
+		// Expecting at least three fields: latitude, longitude, location_name.
+		if len(record) < 3 {
+			fmt.Printf("Skipping record, not enough fields: %v\n", record)
+			continue
+		}
+
+		lat, err := strconv.ParseFloat(strings.TrimSpace(record[0]), 64)
+		if err != nil {
+			fmt.Printf("Skipping record, invalid latitude: %v\n", err)
+			continue
+		}
+		lng, err := strconv.ParseFloat(strings.TrimSpace(record[1]), 64)
+		if err != nil {
+			fmt.Printf("Skipping record, invalid longitude: %v\n", err)
+			continue
+		}
+		name := strings.TrimSpace(record[2])
+
+		dataCenters = append(dataCenters, DataCenter{
+			Name:      name,
+			Latitude:  lat,
+			Longitude: lng,
+		})
 	}
 	return dataCenters, nil
 }
