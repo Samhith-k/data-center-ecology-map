@@ -4,6 +4,7 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './Game.css'; // <-- The CSS you will enhance below
+import SimulationModal from './SimulationModal';
 // Add this line after your existing imports:
 
 
