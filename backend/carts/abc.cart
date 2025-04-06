@@ -1,0 +1,30 @@
+{
+  "username": "abc",
+  "items": [
+    {
+      "latitude": 41.4201,
+      "longitude": -71.4662,
+      "name": "North Kingstown, RI",
+      "land_price": "$120,000",
+      "electricity": "$0.1824/kWh",
+      "notes": "{notes:[\"Former naval base"
+    },
+    {
+      "latitude": 36.9685,
+      "longitude": -86.4808,
+      "name": "Bowling Green, KY",
+      "land_price": "$50,000",
+      "electricity": "$0.0870/kWh",
+      "notes": "{notes:[\"Western Kentucky"
+    },
+    {
+      "latitude": 41.14,
+      "longitude": -104.8202,
+      "name": "Cheyenne (East), WY",
+      "land_price": "$55,000",
+      "electricity": "$0.0679/kWh",
+      "notes": "{notes:[\"Green House Data presence"
+    }
+  ],
+  "money_left": 775000
+}

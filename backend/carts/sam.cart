@@ -2,21 +2,61 @@
   "username": "sam",
   "items": [
     {
-      "latitude": 39.7693,
-      "longitude": -86.157,
-      "name": "Indianapolis (Near East), IN",
-      "land_price": "$110,000",
-      "electricity": "$0.0959/kWh",
-      "notes": "{notes:[\"LightBound presence"
+      "latitude": 34.5004,
+      "longitude": -80.7771,
+      "name": "Lancaster, SC",
+      "land_price": "$50,000",
+      "electricity": "$0.0904/kWh",
+      "notes": "{notes:[\"Charlotte metro area"
     },
     {
-      "latitude": 38.8487,
-      "longitude": -81.9621,
-      "name": "Parkersburg, WV",
-      "land_price": "$35,000",
-      "electricity": "$0.0858/kWh",
-      "notes": "{notes:[\"Ohio River"
+      "latitude": 34.5004,
+      "longitude": -80.7771,
+      "name": "Lancaster, SC",
+      "land_price": "$50,000",
+      "electricity": "$0.0904/kWh",
+      "notes": "{notes:[\"Charlotte metro area"
+    },
+    {
+      "latitude": 34.5004,
+      "longitude": -80.7771,
+      "name": "Lancaster, SC",
+      "land_price": "$50,000",
+      "electricity": "$0.0904/kWh",
+      "notes": "{notes:[\"Charlotte metro area"
+    },
+    {
+      "latitude": 34.5004,
+      "longitude": -80.7771,
+      "name": "Lancaster, SC",
+      "land_price": "$50,000",
+      "electricity": "$0.0904/kWh",
+      "notes": "{notes:[\"Charlotte metro area"
+    },
+    {
+      "latitude": 40.2969,
+      "longitude": -111.6946,
+      "name": "Provo, UT",
+      "land_price": "$150,000",
+      "electricity": "$0.0744/kWh",
+      "notes": "{notes:[\"Utah County"
+    },
+    {
+      "latitude": 40.2969,
+      "longitude": -111.6946,
+      "name": "Provo, UT",
+      "land_price": "$150,000",
+      "electricity": "$0.0744/kWh",
+      "notes": "{notes:[\"Utah County"
+    },
+    {
+      "latitude": 40.2969,
+      "longitude": -111.6946,
+      "name": "Provo, UT",
+      "land_price": "$150,000",
+      "electricity": "$0.0744/kWh",
+      "notes": "{notes:[\"Utah County"
     }
   ],
-  "money_left": 855000
+  "money_left": 350000
 }

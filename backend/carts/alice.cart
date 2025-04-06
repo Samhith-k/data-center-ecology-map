@@ -2,12 +2,29 @@
   "username": "alice",
   "items": [
     {
-      "latitude": 29,
-      "longitude": -95.3,
-      "name": "Test HPC Facility",
-      "land_price": "2.5M per acre",
-      "notes": "High Performance HPC in a southern coal region"
+      "latitude": 45,
+      "longitude": -93,
+      "name": "Standard DC",
+      "land_price": "$2,000,000",
+      "electricity": "$0.07/kWh",
+      "notes": "standard"
+    },
+    {
+      "latitude": 40.7,
+      "longitude": -74,
+      "name": "Eco Optimized Center",
+      "land_price": "$3,500,000",
+      "electricity": "Renewable",
+      "notes": "eco"
+    },
+    {
+      "latitude": 45,
+      "longitude": -93,
+      "name": "Standard DC",
+      "land_price": "$2,000,000",
+      "electricity": "$0.07/kWh",
+      "notes": "standard"
     }
   ],
-  "money_left": 700000
+  "money_left": 250000
 }

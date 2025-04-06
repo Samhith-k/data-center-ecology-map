@@ -1,9 +1,13 @@
 // src/components/Game.js
 import React, { useState, useEffect } from 'react';
+import SimulationModal from './SimulationModal';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './Game.css'; // <-- The CSS you will enhance below
+// Add this line after your existing imports:
+
+
 
 // Fix for Leaflet marker icons
 delete L.Icon.Default.prototype._getIconUrl;
@@ -38,6 +42,8 @@ const builtIcon = new L.DivIcon({
   popupAnchor: [0, -7]
 });
 
+
+
 const potentialLocationIcon = new L.DivIcon({
   className: 'custom-map-marker',
   html: `<div class="map-dot orange-dot"></div>`,
@@ -59,6 +65,13 @@ function Game({ username, onLogout }) {
   // Cart state
   const [cartItems, setCartItems] = useState([]);
   const [showCart, setShowCart] = useState(false);
+  // New state for simulation modal and simulation data
+  const [showSimulation, setShowSimulation] = useState(false);
+  const [simulationData, setSimulationData] = useState({
+    data: [],
+    total_time_to_end: 0,
+    time_datacenters_removed: 0
+  });
 
   // Standard states
   const [availableLocations, setAvailableLocations] = useState([]);
@@ -75,6 +88,24 @@ function Game({ username, onLogout }) {
   const [notification, setNotification] = useState(null);
   const [showFullDetails, setShowFullDetails] = useState(false);
   const [recentlyViewedLocations, setRecentlyViewedLocations] = useState([]);
+
+
+  const fetchCarbonFootprint = async () => {
+    try {
+      const res = await fetch(`http://localhost:8080/cart/carbon-footprint?username=${username}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+      if (!res.ok) {
+        throw new Error(`Failed to fetch carbon footprint: ${res.status}`);
+      }
+      const data = await res.json();
+      setCarbonFootprint(data.carbon_footprint || 0);
+    } catch (error) {
+      console.error("Error fetching carbon footprint:", error);
+    }
+  };
+
 
   // Building options with different specifications
   const buildingOptions = [
@@ -164,6 +195,7 @@ function Game({ username, onLogout }) {
       console.log("Item added to cart:", location);
       // Reload the cart
       fetchCart();
+      fetchCarbonFootprint();
     } catch (err) {
       console.error("Error adding to cart:", err);
     }
@@ -183,10 +215,30 @@ function Game({ username, onLogout }) {
       console.log("Item removed from cart at index:", index);
       // Reload cart
       fetchCart();
+      fetchCarbonFootprint();
     } catch (err) {
       console.error("Error removing cart item:", err);
     }
   };
+
+  //----------------------------------------------------
+  // SIMULATION FUNCTION
+  //----------------------------------------------------
+  const handleSimulate = async () => {
+    try {
+      const res = await fetch(`http://localhost:8080/api/simulation?username=${username}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+      if (!res.ok) throw new Error(`Simulation API error: ${res.status}`);
+      const data = await res.json();
+      setSimulationData(data);
+      setShowSimulation(true);
+    } catch (error) {
+      console.error("Simulation error:", error);
+    }
+  };
+
 
   //----------------------------------------------------
   // Existing fetch of data centers & potential locations
@@ -950,6 +1002,12 @@ function Game({ username, onLogout }) {
                   Add to Cart
                 </button>
               </div>
+              <div className="my-3">
+                <button className="btn btn-warning" onClick={handleSimulate}>
+                  <i className="bi bi-graph-up"></i> Simulate
+                </button>
+              </div>
+
             </>
           ) : (
             <div className="empty-state">
@@ -1040,6 +1098,13 @@ function Game({ username, onLogout }) {
         </div>
       )}
       {showCart && <div className="cart-backdrop" onClick={() => setShowCart(false)}></div>}
+      {/* Simulation Modal */}
+      <SimulationModal
+        show={showSimulation}
+        handleClose={() => setShowSimulation(false)}
+        simulationData={simulationData}
+      />
+
     </div>
   );
 }
