@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"github.com/Samhith-k/data-center-ecology-map/backend/internal/data"
@@ -141,4 +142,50 @@ func DeleteCart(username string) error {
 		return fmt.Errorf("failed to delete cart file: %v", err)
 	}
 	return nil
+}
+
+func CalculateCarbonFootprint(username string) (float64, error) {
+	cartMu.RLock()
+	c, exists := carts[username]
+	cartMu.RUnlock()
+	if !exists {
+		// if no cart, zero footprint
+		return 0, nil
+	}
+
+	var totalCarbon float64
+	for _, item := range c.Items {
+		totalCarbon += computeCarbonForItem(item)
+	}
+	return totalCarbon, nil
+}
+
+// Simple example: parse item notes or name to guess carbon
+func computeCarbonForItem(item data.DatacenterLocation) float64 {
+	// Basic example logic:
+	//   0.8 for "Standard"
+	//   0.4 for "Eco"
+	//   0.1 for "Next-Gen"
+	base := 1.0
+	nameLower := strings.ToLower(item.Name)
+	notesLower := strings.ToLower(item.Notes)
+
+	switch {
+	case strings.Contains(nameLower, "eco") || strings.Contains(notesLower, "eco"):
+		base = 0.4
+	case strings.Contains(nameLower, "next-gen") || strings.Contains(notesLower, "next-gen"):
+		base = 0.1
+	case strings.Contains(nameLower, "standard") || strings.Contains(notesLower, "standard"):
+		base = 0.8
+	default:
+		base = 1.0 // fallback
+	}
+
+	// Possibly adjust for electricity, e.g. if item.Electricity includes "renewable"
+	if strings.Contains(strings.ToLower(item.Electricity), "renewable") {
+		base *= 0.5
+	}
+
+	// Return that as "metric tons (MT) per day" or whatever your convention
+	return base
 }

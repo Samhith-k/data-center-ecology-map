@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import './Game.css';
+import './Game.css'; // <-- The CSS you will enhance below
 
 // Fix for Leaflet marker icons
 delete L.Icon.Default.prototype._getIconUrl;
@@ -140,7 +140,7 @@ function Game({ username, onLogout }) {
     try {
       let cost = location.land_cost || 100000;
       const itemPayload = {
-        username: username,
+        username,
         item: {
           latitude: location.position.lat,
           longitude: location.position.lng,
@@ -149,7 +149,7 @@ function Game({ username, onLogout }) {
           electricity: location.electricity_cost || "$0.07/kWh",
           notes: location.description || "Data center location"
         },
-        cost: cost
+        cost
       };
 
       const res = await fetch("http://localhost:8080/cart/add", {
@@ -352,6 +352,7 @@ function Game({ username, onLogout }) {
   // Once user logs in, load their cart
   useEffect(() => {
     fetchCart();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [username]);
 
   // Helpers
@@ -477,7 +478,9 @@ function Game({ username, onLogout }) {
     if (budget >= totalCost) {
       // existing build logic ...
       setBudget(prev => prev - totalCost);
-      // etc...
+      // If you want to track built data centers more thoroughly, you can do:
+      // setBuiltDataCenters([...builtDataCenters, { building, location: selectedLocation }]);
+      // setDay(day + 30); etc.
 
       // Then ALSO add to cart
       addToCart(selectedLocation);
@@ -525,25 +528,25 @@ function Game({ username, onLogout }) {
 
         <div className="game-stats">
           <div className="stat">
-            <span className="stat-icon">💰</span>
+            <i className="bi bi-cash-stack stat-icon"></i>
             <span className="stat-label">Budget:</span>
             <span className="stat-value">${budget.toLocaleString()}</span>
           </div>
 
           <div className="stat">
-            <span className="stat-icon">📊</span>
+            <i className="bi bi-bar-chart stat-icon"></i>
             <span className="stat-label">Score:</span>
             <span className="stat-value">{Math.round(score)}</span>
           </div>
 
           <div className="stat">
-            <span className="stat-icon">🏭</span>
+            <i className="bi bi-cloud-fog2 stat-icon"></i>
             <span className="stat-label">Carbon:</span>
             <span className="stat-value">{carbonFootprint.toFixed(1)} MT</span>
           </div>
 
           <div className="stat">
-            <span className="stat-icon">📅</span>
+            <i className="bi bi-calendar3 stat-icon"></i>
             <span className="stat-label">Day:</span>
             <span className="stat-value">{day}</span>
           </div>
@@ -551,7 +554,7 @@ function Game({ username, onLogout }) {
 
         <div className="user-controls">
           <span className="username">Welcome, {username}!</span>
-          <button onClick={onLogout} className="logout-button">
+          <button onClick={onLogout} className="logout-button btn btn-danger">
             Logout
           </button>
         </div>
@@ -615,7 +618,6 @@ function Game({ username, onLogout }) {
 
             {potentialLocations.map(location => {
               const isSelected = selectedLocation && selectedLocation.id === location.id;
-              // check cart
               const isInCart = cartItems.some(
                 ci => parseFloat(ci.latitude) === location.position.lat &&
                   parseFloat(ci.longitude) === location.position.lng
@@ -662,9 +664,15 @@ function Game({ username, onLogout }) {
                   <div>
                     <h3>{dataCenter.location.name}</h3>
                     <p>Facility: {dataCenter.building.name}</p>
-                    <p>Built on day: {dataCenter.dayBuilt}</p>
+                    <p>Built on day: {dataCenter.dayBuilt || 'N/A'}</p>
                     <p>Efficiency: {dataCenter.building.energyEfficiency}%</p>
-                    <p>Carbon Impact: {(dataCenter.building.carbonImpact * (100 - calculateLocationScore(dataCenter.location)) / 100).toFixed(2)} MT/day</p>
+                    <p>
+                      Carbon Impact: {
+                        (dataCenter.building.carbonImpact *
+                          (100 - calculateLocationScore(dataCenter.location)) / 100
+                        ).toFixed(2)
+                      } MT/day
+                    </p>
                   </div>
                 </Popup>
               </Marker>
@@ -689,44 +697,64 @@ function Game({ username, onLogout }) {
 
                 <div className="metric">
                   <div className="metric-label">
-                    <span className="metric-icon climate">🌡️</span>
+                    <span className="metric-icon climate">
+                      <i className="bi bi-thermometer-sun"></i>
+                    </span>
                     <span>Climate Suitability</span>
                   </div>
                   <div className="metric-bar">
-                    <div className="metric-fill" style={{ width: `${selectedLocation.climate}%` }}></div>
+                    <div
+                      className="metric-fill"
+                      style={{ width: `${selectedLocation.climate}%` }}
+                    ></div>
                   </div>
                   <span className="metric-value">{selectedLocation.climate}%</span>
                 </div>
 
                 <div className="metric">
                   <div className="metric-label">
-                    <span className="metric-icon renewable">🔆</span>
+                    <span className="metric-icon renewable">
+                      <i className="bi bi-sun"></i>
+                    </span>
                     <span>Renewable Potential</span>
                   </div>
                   <div className="metric-bar">
-                    <div className="metric-fill" style={{ width: `${selectedLocation.renewable}%` }}></div>
+                    <div
+                      className="metric-fill"
+                      style={{ width: `${selectedLocation.renewable}%` }}
+                    ></div>
                   </div>
                   <span className="metric-value">{selectedLocation.renewable}%</span>
                 </div>
 
                 <div className="metric">
                   <div className="metric-label">
-                    <span className="metric-icon grid">⚡</span>
+                    <span className="metric-icon grid">
+                      <i className="bi bi-lightning-charge"></i>
+                    </span>
                     <span>Grid Cleanliness</span>
                   </div>
                   <div className="metric-bar">
-                    <div className="metric-fill" style={{ width: `${selectedLocation.grid}%` }}></div>
+                    <div
+                      className="metric-fill"
+                      style={{ width: `${selectedLocation.grid}%` }}
+                    ></div>
                   </div>
                   <span className="metric-value">{selectedLocation.grid}%</span>
                 </div>
 
                 <div className="metric">
                   <div className="metric-label">
-                    <span className="metric-icon risk">⚠️</span>
+                    <span className="metric-icon risk">
+                      <i className="bi bi-exclamation-triangle"></i>
+                    </span>
                     <span>Disaster Safety</span>
                   </div>
                   <div className="metric-bar">
-                    <div className="metric-fill" style={{ width: `${selectedLocation.risk}%` }}></div>
+                    <div
+                      className="metric-fill"
+                      style={{ width: `${selectedLocation.risk}%` }}
+                    ></div>
                   </div>
                   <span className="metric-value">{selectedLocation.risk}%</span>
                 </div>
@@ -734,41 +762,53 @@ function Game({ username, onLogout }) {
                 <div className="metric-summary">
                   <div>
                     <span>Overall Rating:</span>
-                    <span className="score">{Math.round(calculateLocationScore(selectedLocation))}/100</span>
+                    <span className="score">
+                      {Math.round(calculateLocationScore(selectedLocation))}/100
+                    </span>
                   </div>
                   <div>
                     <span>Land Cost:</span>
-                    <span className="cost">${selectedLocation.land_cost.toLocaleString()}</span>
+                    <span className="cost">
+                      ${selectedLocation.land_cost.toLocaleString()}
+                    </span>
                   </div>
                 </div>
 
-                <p className="location-description">{selectedLocation.description}</p>
+                <p className="location-description">
+                  {selectedLocation.description}
+                </p>
               </div>
 
               {selectedLocation.isPotential && (
                 <div className="property-details">
                   <h3>Property Details</h3>
                   <div className="detail-item">
-                    <span className="detail-icon">🏢</span>
+                    <span className="detail-icon">
+                      <i className="bi bi-building"></i>
+                    </span>
                     <span className="detail-label">Location Name:</span>
                     <span className="detail-value">{selectedLocation.name}</span>
                   </div>
                   {selectedLocation.electricity_cost && (
                     <div className="detail-item">
-                      <span className="detail-icon">⚡</span>
+                      <span className="detail-icon">
+                        <i className="bi bi-lightning"></i>
+                      </span>
                       <span className="detail-label">Electricity Cost:</span>
                       <span className="detail-value">{selectedLocation.electricity_cost}</span>
                     </div>
                   )}
                   {selectedLocation.connectivity && (
                     <div className="detail-item">
-                      <span className="detail-icon">🌐</span>
+                      <span className="detail-icon">
+                        <i className="bi bi-globe"></i>
+                      </span>
                       <span className="detail-label">Network Connectivity:</span>
                       <span className="detail-value">{selectedLocation.connectivity}</span>
                     </div>
                   )}
                   <button
-                    className="toggle-details-btn"
+                    className="toggle-details-btn btn btn-sm btn-outline-secondary"
                     onClick={() => setShowFullDetails(prev => !prev)}
                   >
                     {showFullDetails ? 'Show Less Details' : 'Show More Details'}
@@ -777,21 +817,31 @@ function Game({ username, onLogout }) {
                     <>
                       {selectedLocation.water_availability && (
                         <div className="detail-item">
-                          <span className="detail-icon">💧</span>
+                          <span className="detail-icon">
+                            <i className="bi bi-droplet-half"></i>
+                          </span>
                           <span className="detail-label">Water Availability:</span>
-                          <span className="detail-value">{selectedLocation.water_availability}</span>
+                          <span className="detail-value">
+                            {selectedLocation.water_availability}
+                          </span>
                         </div>
                       )}
                       {selectedLocation.tax_incentives && (
                         <div className="detail-item">
-                          <span className="detail-icon">📋</span>
+                          <span className="detail-icon">
+                            <i className="bi bi-cash"></i>
+                          </span>
                           <span className="detail-label">Tax Incentives:</span>
-                          <span className="detail-value">{selectedLocation.tax_incentives}</span>
+                          <span className="detail-value">
+                            {selectedLocation.tax_incentives}
+                          </span>
                         </div>
                       )}
                       {selectedLocation.zone_type && (
                         <div className="detail-item">
-                          <span className="detail-icon">🏗️</span>
+                          <span className="detail-icon">
+                            <i className="bi bi-signpost-2"></i>
+                          </span>
                           <span className="detail-label">Zone Type:</span>
                           <span className="detail-value">{selectedLocation.zone_type}</span>
                         </div>
@@ -805,9 +855,9 @@ function Game({ username, onLogout }) {
               {recentlyViewedLocations.length > 0 && (
                 <div className="location-comparison">
                   <h3>Location Comparison</h3>
-                  <div className="comparison-chart">
-                    <table>
-                      <thead>
+                  <div className="comparison-chart table-responsive">
+                    <table className="table table-sm table-bordered">
+                      <thead className="thead-light">
                         <tr>
                           <th>Location</th>
                           <th>Climate</th>
@@ -854,9 +904,11 @@ function Game({ username, onLogout }) {
                       key={building.id}
                       className={`building-option ${!canAfford ? 'disabled' : ''}`}
                     >
-                      <div className="building-header">
+                      <div className="building-header d-flex justify-content-between align-items-center">
                         <h4>{building.name}</h4>
-                        <span className="building-cost">${building.cost.toLocaleString()}</span>
+                        <span className="building-cost">
+                          ${building.cost.toLocaleString()}
+                        </span>
                       </div>
                       <p className="building-description">{building.description}</p>
                       <div className="building-specs">
@@ -878,7 +930,7 @@ function Game({ username, onLogout }) {
                         <span>${totalCost.toLocaleString()}</span>
                       </div>
                       <button
-                        className="build-button"
+                        className="build-button btn btn-primary"
                         onClick={() => handleBuild(building)}
                         disabled={!canAfford}
                       >
@@ -902,7 +954,10 @@ function Game({ username, onLogout }) {
           ) : (
             <div className="empty-state">
               <h3>Select a Location</h3>
-              <p>Click on a blue marker on the map to view location details and build a data center.</p>
+              <p>
+                Click on a blue marker on the map to view location details and build a data
+                center.
+              </p>
               <div className="game-instructions">
                 <h3>How to Play</h3>
                 <ol>
@@ -914,8 +969,14 @@ function Game({ username, onLogout }) {
                 </ol>
                 <div className="game-goal">
                   <h4>Goal</h4>
-                  <p>Build the most efficient and environmentally friendly global data center network while managing your budget wisely.</p>
-                  <p>Higher scores are achieved by placing data centers in locations with good environmental metrics and using more efficient facilities.</p>
+                  <p>
+                    Build the most efficient and environmentally friendly global data center
+                    network while managing your budget wisely.
+                  </p>
+                  <p>
+                    Higher scores are achieved by placing data centers in locations with good
+                    environmental metrics and using more efficient facilities.
+                  </p>
                 </div>
               </div>
             </div>
@@ -936,7 +997,7 @@ function Game({ username, onLogout }) {
         className="btn btn-primary cart-toggle-button"
         onClick={() => setShowCart(true)}
       >
-        Cart
+        <i className="bi bi-cart-fill"></i> Cart
       </button>
 
       {/* CART SIDEBAR */}

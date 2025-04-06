@@ -17,6 +17,35 @@ type AddToCartRequest struct {
 	Cost     float64                 `json:"cost"`
 }
 
+func GetCarbonFootprintHandler(w http.ResponseWriter, r *http.Request) {
+	addCORSHeaders(w) // if you have a helper for CORS
+	if r.Method == http.MethodOptions {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
+	if r.Method != http.MethodGet {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	username := r.URL.Query().Get("username")
+	if username == "" {
+		http.Error(w, "Missing username query parameter", http.StatusBadRequest)
+		return
+	}
+
+	footprint, err := cart.CalculateCarbonFootprint(username)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Error calculating footprint: %v", err), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]float64{
+		"carbon_footprint": footprint,
+	})
+}
+
 // AddToCartHandler handles POST /cart/add.
 func AddToCartHandler(w http.ResponseWriter, r *http.Request) {
 	addCORSHeaders(w)

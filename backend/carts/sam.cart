@@ -2,21 +2,21 @@
   "username": "sam",
   "items": [
     {
-      "latitude": 31.7619,
-      "longitude": -106.485,
-      "name": "El Paso, TX",
-      "land_price": "$80,000",
-      "electricity": "$0.0813/kWh",
-      "notes": "{notes:[\"Border Data Center presence"
+      "latitude": 39.7693,
+      "longitude": -86.157,
+      "name": "Indianapolis (Near East), IN",
+      "land_price": "$110,000",
+      "electricity": "$0.0959/kWh",
+      "notes": "{notes:[\"LightBound presence"
     },
     {
-      "latitude": 38.0406,
-      "longitude": -84.5037,
-      "name": "Lexington, KY",
-      "land_price": "$80,000",
-      "electricity": "$0.0870/kWh",
-      "notes": "{notes:[\"University resources"
+      "latitude": 38.8487,
+      "longitude": -81.9621,
+      "name": "Parkersburg, WV",
+      "land_price": "$35,000",
+      "electricity": "$0.0858/kWh",
+      "notes": "{notes:[\"Ohio River"
     }
   ],
-  "money_left": 840000
+  "money_left": 855000
 }

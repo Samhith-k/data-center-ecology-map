@@ -7,6 +7,8 @@ import Register from './components/Register';
 import Game from './components/Game';
 import ApiService from './services/api';
 import logo from './logo.svg';
+import 'bootstrap-icons/font/bootstrap-icons.css';
+
 
 function App() {
   const [user, setUser] = useState(null);

@@ -793,17 +793,17 @@ func distance(lat1, lon1, lat2, lon2 float64) float64 {
 
 // Handler for getting all possible datacenter locations
 func possibleDataCenterHandler(w http.ResponseWriter, r *http.Request) {
-    // Add CORS headers
-    w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
-    w.Header().Set("Access-Control-Allow-Credentials", "true")
-    w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
-    w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+	// Add CORS headers
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:3000")
+	w.Header().Set("Access-Control-Allow-Credentials", "true")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 
-    // Handle preflight requests
-    if r.Method == http.MethodOptions {
-        w.WriteHeader(http.StatusOK)
-        return
-    }
+	// Handle preflight requests
+	if r.Method == http.MethodOptions {
+		w.WriteHeader(http.StatusOK)
+		return
+	}
 
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -826,9 +826,8 @@ func possibleDataCenterHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-    // Remove this conflicting line:
-    // w.Header().Set("Access-Control-Allow-Origin", "*")
-    json.NewEncoder(w).Encode(response)
+	w.Header().Set("Access-Control-Allow-Origin", "*") // Allow cross-origin requests
+	json.NewEncoder(w).Encode(response)
 }
 
 // Handler for getting property details based on lat/long

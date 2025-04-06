@@ -1,460 +1,87 @@
-/* src/components/Game.css */
-:root {
-  --primary-color: #1e3a8a;
-  --secondary-color: #3b82f6;
-  --accent-color: #60a5fa;
-  --bg-dark: #0f172a;
-  --bg-medium: #1e293b;
-  --bg-light: #334155;
-  --text-light: #f8fafc;
-  --text-muted: #94a3b8;
-  --success-color: #10b981;
-  --warning-color: #f59e0b;
-  --danger-color: #ef4444;
+/* =============================
+   MAP MARKERS (colored dots)
+   ============================= */
+.custom-map-marker {
+  /*position: relative;*/
 }
 
-.game-container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  background-color: #f0f2f5;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+.map-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
 }
 
-/* Game Header */
-.game-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #2c3e50;
-  color: white;
+.blue-dot {
+  background-color: #007bff;
+  /* "available" data center */
 }
 
-.game-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  color: var(--accent-color);
-  flex: 1;
+.green-dot {
+  background-color: #28a745;
+  /* "selected" data center */
 }
 
-.game-stats {
-  display: flex;
-  justify-content: center;
-  gap: 1.5rem;
-  flex: 2;
+.purple-dot {
+  background-color: #6f42c1;
+  /* "built" data center */
 }
 
-.stat {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+.orange-dot {
+  background-color: #fd7e14;
+  /* "potential" data center */
 }
 
-.user-controls {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  justify-content: flex-end;
-  flex: 1;
+.cart-dot {
+  background-color: #ff9900;
+  /* "in cart" data center */
 }
 
-
-.username {
+/* =============================
+     BUTTON & HOVER EFFECTS
+     ============================= */
+.btn {
   font-weight: 500;
-  color: var(--text-light);
-  margin-right: 1rem;
+  border-radius: 4px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.logout-button {
-  padding: 0.5rem 1rem;
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 0.25rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
+/* Slight "lift" on hover for a 3D effect */
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 
-.logout-button:hover {
-  background-color: var(--secondary-color);
+.btn:active {
+  transform: translateY(0);
+  box-shadow: none;
 }
 
-.stat-icon {
-  font-size: 1.25rem;
-}
-
-.stat-label {
-  color: var(--text-muted);
-}
-
-.stat-value {
-  font-weight: bold;
-  font-family: 'Courier New', monospace;
-}
-
-/* Main Game Content */
-.game-content {
-  display: flex;
-  flex: 1;
-  padding: 1rem;
-  gap: 1rem;
-}
-
-/* Map Styles */
-.world-map {
-  flex: 3;
-  background-color: var(--bg-medium);
-  border-radius: 0.5rem;
-  padding: 1rem;
-  display: flex;
-  flex-direction: column;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-.world-map h2 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  color: var(--secondary-color);
-}
-
+/* Map "select" buttons inside the popups */
 .map-select-btn {
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  padding: 0.5rem;
-  border-radius: 0.25rem;
   margin-top: 0.5rem;
-  cursor: pointer;
-  width: 100%;
-  transition: background-color 0.2s;
+  font-size: 0.85rem;
 }
 
-.map-select-btn:hover {
-  background-color: var(--secondary-color);
-}
-
-/* Info Panel */
-.info-panel {
-  flex: 2;
-  background-color: var(--bg-medium);
-  border-radius: 0.5rem;
-  padding: 1rem;
-  overflow-y: auto;
-  max-height: calc(100vh - 10rem);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-}
-
-.info-panel h2 {
-  margin-top: 0;
-  color: var(--accent-color);
-  border-bottom: 1px solid var(--bg-light);
-  padding-bottom: 0.5rem;
-}
-
-.metrics-container {
-  background-color: var(--bg-light);
-  border-radius: 0.5rem;
-  padding: 1rem;
-  margin-bottom: 1.5rem;
-}
-
-.metrics-container h3 {
-  margin-top: 0;
-  margin-bottom: 1rem;
-  color: var(--text-light);
-}
-
-.metric {
-  display: flex;
-  align-items: center;
-  margin-bottom: 0.75rem;
-  gap: 0.5rem;
-}
-
-.metric-label {
-  display: flex;
-  align-items: center;
-  width: 40%;
-  gap: 0.5rem;
-}
-
-.metric-bar {
-  flex-grow: 1;
-  height: 0.75rem;
-  background-color: var(--bg-medium);
-  border-radius: 1rem;
-  overflow: hidden;
-}
-
-.metric-fill {
-  height: 100%;
-  background-color: var(--secondary-color);
-  border-radius: 1rem;
-}
-
-.metric-value {
-  width: 3rem;
-  text-align: right;
-  font-weight: bold;
-}
-
-.metric-summary {
-  display: flex;
-  justify-content: space-between;
-  border-top: 1px solid var(--bg-medium);
-  padding-top: 0.75rem;
-  margin-top: 0.75rem;
-}
-
-.score {
-  font-weight: bold;
-  color: var(--accent-color);
-  margin-left: 0.5rem;
-}
-
-.cost {
-  font-weight: bold;
-  color: var(--warning-color);
-  margin-left: 0.5rem;
-}
-
-.location-description {
-  margin-top: 1rem;
-  font-style: italic;
-  color: var(--text-muted);
-  line-height: 1.5;
-}
-
-/* Building Options */
-.building-options {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.building-options h3 {
-  margin-top: 0;
-  margin-bottom: 0.5rem;
-  color: var(--text-light);
-}
-
-.building-option {
-  background-color: var(--bg-light);
-  border-radius: 0.5rem;
-  padding: 1rem;
-  border: 1px solid transparent;
-  transition: border-color 0.2s;
-}
-
-.building-option:hover:not(.disabled) {
-  border-color: var(--accent-color);
-}
-
-.building-option.disabled {
-  opacity: 0.7;
-  cursor: not-allowed;
-}
-
-.building-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 0.5rem;
-}
-
-.building-header h4 {
-  margin: 0;
-  color: var(--accent-color);
-}
-
-.building-cost {
-  font-weight: bold;
-  color: var(--warning-color);
-}
-
-.building-description {
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  margin-bottom: 1rem;
-  line-height: 1.4;
-}
-
-.building-specs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-bottom: 1rem;
-}
-
-.spec {
-  display: flex;
-  gap: 0.5rem;
-  font-size: 0.9rem;
-}
-
-.spec span:first-child {
-  color: var(--text-muted);
-}
-
-.spec span:last-child {
-  font-weight: bold;
-}
-
-.total-cost {
-  display: flex;
-  justify-content: space-between;
-  border-top: 1px dashed var(--bg-medium);
-  padding-top: 0.75rem;
-  margin-bottom: 1rem;
-  font-weight: bold;
-}
-
-.build-button {
-  width: 100%;
-  padding: 0.75rem;
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  border-radius: 0.25rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.build-button:hover:not(:disabled) {
-  background-color: var(--secondary-color);
-}
-
-.build-button:disabled {
-  background-color: var(--bg-medium);
-  color: var(--text-muted);
-  cursor: not-allowed;
-}
-
-/* Empty State */
-.empty-state {
-  display: flex;
-  flex-direction: column;
+/* =============================
+     LOADER & ERROR STATES
+     ============================= */
+.game-loading,
+.game-error {
   text-align: center;
-  color: var(--text-muted);
-  height: 100%;
-}
-
-.empty-state h3 {
-  color: var(--text-light);
-  margin-bottom: 0.5rem;
-}
-
-.game-instructions {
-  margin-top: 2rem;
-  text-align: left;
-  background-color: var(--bg-light);
-  padding: 1rem;
-  border-radius: 0.5rem;
-}
-
-.game-instructions h3 {
-  margin-top: 0;
-  color: var(--accent-color);
-}
-
-.game-instructions ol {
-  padding-left: 1.5rem;
-  margin-bottom: 1.5rem;
-}
-
-.game-instructions li {
-  margin-bottom: 0.5rem;
-  line-height: 1.4;
-}
-
-.game-goal {
-  border-top: 1px solid var(--bg-medium);
-  padding-top: 1rem;
-}
-
-.game-goal h4 {
-  margin-top: 0;
-  color: var(--accent-color);
-}
-
-.game-goal p {
-  line-height: 1.4;
-  margin-bottom: 0.5rem;
-}
-
-/* Notification */
-.game-notification {
-  position: fixed;
-  bottom: 2rem;
-  right: 2rem;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  background-color: var(--bg-medium);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
-  animation: slide-in 0.3s ease-out;
-  max-width: 400px;
-}
-
-.game-notification.success {
-  border-left: 4px solid var(--success-color);
-}
-
-.game-notification.error {
-  border-left: 4px solid var(--danger-color);
-}
-
-.game-notification p {
-  margin: 0;
-  flex-grow: 1;
-}
-
-.notification-close {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  font-size: 1.5rem;
-  cursor: pointer;
-  padding: 0;
-  line-height: 1;
-}
-
-@keyframes slide-in {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-/* Loading and Error States */
-.game-loading {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-color: var(--bg-dark);
+  padding: 2rem;
 }
 
 .loader {
-  border: 5px solid var(--bg-light);
-  border-top: 5px solid var(--accent-color);
+  margin: 1rem auto;
+  border: 8px solid #e9ecef;
+  border-top: 8px solid #007bff;
   border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 1s linear infinite;
-  margin-bottom: 1rem;
+  width: 60px;
+  height: 60px;
+  animation: spin 0.8s linear infinite;
 }
 
+/* Simple spinner animation */
 @keyframes spin {
   0% {
     transform: rotate(0deg);
@@ -465,84 +92,399 @@
   }
 }
 
-.game-error {
+/* =============================
+     MAIN CONTAINER & HEADER
+     ============================= */
+.game-container {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background-color: var(--bg-dark);
-  padding: 2rem;
-  text-align: center;
+  height: 100vh;
 }
 
-.game-error h2 {
-  color: var(--danger-color);
+.game-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8f9fa;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #ccc;
+}
+
+.game-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #343a40;
+  margin: 0;
+}
+
+.game-stats {
+  display: flex;
+  align-items: center;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  margin-right: 20px;
+  font-size: 1rem;
+  color: #343a40;
+}
+
+.stat-icon {
+  font-size: 1.2rem;
+  margin-right: 6px;
+  color: #007bff;
+  /* A nice bootstrap-blue shade */
+}
+
+.stat-label {
+  font-weight: 600;
+  margin-right: 5px;
+}
+
+.stat-value {
+  font-weight: 500;
+  color: #212529;
+}
+
+.user-controls {
+  display: flex;
+  align-items: center;
+}
+
+.username {
+  margin-right: 1rem;
+  font-weight: 500;
+}
+
+/* =============================
+     GAME CONTENT AREA
+     ============================= */
+.game-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* World Map styling (left panel) */
+.world-map {
+  flex: 2;
+  min-width: 50%;
+  padding: 1rem;
+  box-sizing: border-box;
+  background: #ffffff;
+  border-right: 1px solid #ccc;
+}
+
+.world-map h2 {
+  color: #343a40;
+  font-weight: 700;
   margin-bottom: 1rem;
 }
 
-.game-error button {
-  background-color: var(--primary-color);
-  color: white;
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 0.25rem;
-  font-weight: bold;
-  cursor: pointer;
+/* =============================
+     INFO PANEL (right panel)
+     ============================= */
+.info-panel {
+  flex: 1;
+  background-color: #f8f9fa;
+  padding: 1rem;
+  border-left: 1px solid #ccc;
+  overflow-y: auto;
+}
+
+.info-panel h2 {
+  margin-top: 0;
+  color: #343a40;
+  font-weight: 700;
+}
+
+/* "Loading location details..." spinner area */
+.loading-details {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 2rem;
+}
+
+/* Empty state / game instructions */
+.empty-state {
   margin-top: 1rem;
-  transition: background-color 0.2s;
 }
 
-.game-error button:hover {
-  background-color: var(--secondary-color);
+.game-instructions {
+  background: #ffffff;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-top: 1.5rem;
 }
 
-/* Add to Game.css */
-.custom-map-marker {
-  background: transparent;
-  border: none;
+.game-instructions h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
 }
 
-.map-dot {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-  border: 2px solid white;
-}
-
-.blue-dot {
-  background-color: #3388ff;
-}
-
-.green-dot {
-  background-color: #2AAD27;
-}
-
-.purple-dot {
-  background-color: #9C2BCB;
-}
-
-.orange-dot {
-  background-color: #FF8C00;
-}
-
-.additional-info {
+.game-goal {
   margin-top: 1rem;
-  padding-top: 0.75rem;
-  border-top: 1px dashed var(--bg-medium);
+  background: #f1f3f5;
+  padding: 0.75rem;
+  border-radius: 4px;
+}
+
+/* =============================
+     METRICS & PROGRESS BARS
+     ============================= */
+.metrics-container {
+  background: #ffffff;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.metrics-container h3 {
+  margin-top: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #343a40;
+  margin-bottom: 0.75rem;
+}
+
+.metric {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
+}
+
+.metric-label {
+  display: flex;
+  align-items: center;
+  width: 160px;
+  font-weight: 500;
+  color: #495057;
+}
+
+.metric-icon {
+  margin-right: 8px;
+  font-size: 1.1rem;
+}
+
+.metric-bar {
+  flex: 1;
+  background: #e9ecef;
+  height: 10px;
+  border-radius: 5px;
+  margin-right: 8px;
+  position: relative;
+}
+
+.metric-fill {
+  height: 10px;
+  background: #007bff;
+  border-radius: 5px;
+  transition: width 0.2s ease;
+}
+
+.metric-value {
+  width: 48px;
+  text-align: right;
+  font-weight: 600;
+  color: #212529;
+}
+
+.metric-summary {
   display: flex;
   justify-content: space-between;
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  color: #495057;
 }
 
-.info-label {
-  color: var(--text-muted);
+.score {
+  font-weight: 700;
+  margin-left: 0.5rem;
+  color: #343a40;
 }
 
-.info-value {
-  font-weight: bold;
+.cost {
+  font-weight: 600;
+  margin-left: 0.5rem;
+  color: #212529;
 }
 
+.location-description {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: #212529;
+}
+
+/* =============================
+     PROPERTY DETAILS
+     ============================= */
+.property-details h3 {
+  margin-top: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.3rem;
+}
+
+.detail-icon {
+  margin-right: 5px;
+}
+
+.detail-label {
+  font-weight: 600;
+  margin-right: 8px;
+  color: #495057;
+}
+
+.detail-value {
+  font-weight: 400;
+  color: #343a40;
+}
+
+/* "Show More Details" button */
+.toggle-details-btn {
+  margin-top: 0.5rem;
+}
+
+/* =============================
+     LOCATION COMPARISON TABLE
+     ============================= */
+.location-comparison {
+  background: #ffffff;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.location-comparison h3 {
+  margin-top: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.current-location {
+  background: #e2e6ea;
+  font-weight: 600;
+}
+
+/* =============================
+     BUILDING OPTIONS
+     ============================= */
+.building-options {
+  margin-top: 1rem;
+}
+
+.building-options h3 {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-top: 0;
+}
+
+.building-option {
+  background: #ffffff;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.building-option:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.06);
+}
+
+.building-option.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.building-header h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.building-cost {
+  font-weight: 600;
+  margin-left: 10px;
+}
+
+.building-description {
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  color: #212529;
+}
+
+.building-specs {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.5rem;
+}
+
+.spec {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: #495057;
+  margin-top: 2px;
+}
+
+.total-cost {
+  font-weight: 600;
+  margin: 0.5rem 0;
+}
+
+.build-button {
+  margin-top: 0.5rem;
+}
+
+/* =============================
+     NOTIFICATION
+     ============================= */
+.game-notification {
+  position: fixed;
+  top: 70px;
+  right: 20px;
+  padding: 1rem;
+  border-radius: 6px;
+  color: #fff;
+  z-index: 9999;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  min-width: 240px;
+}
+
+.game-notification.success {
+  background-color: #28a745;
+}
+
+.game-notification.error {
+  background-color: #dc3545;
+}
+
+.notification-close {
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-size: 1.2rem;
+  margin-left: 0.5rem;
+  cursor: pointer;
+}
+
+/* =============================
+     CART SIDEBAR
+     ============================= */
 .cart-toggle-button {
   position: absolute;
   bottom: 20px;
@@ -556,26 +498,39 @@
   right: 0;
   width: 300px;
   height: 100vh;
-  background-color: #fff;
-  border-left: 2px solid #ccc;
+  background-color: #f8f9fa;
+  /* A light gray (Bootstrap style) */
+  border-left: 2px solid #dee2e6;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
   padding: 1rem;
   z-index: 1000;
   overflow-y: auto;
-  /* scrollable */
 }
 
-.cart-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+.cart-header h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0;
 }
 
 .close-cart-btn {
-  margin-left: auto;
+  font-size: 0.9rem;
+  padding: 4px 8px;
 }
 
 .cart-body {
   margin-top: 1rem;
+}
+
+.cart-item {
+  background-color: #ffffff;
+  border-radius: 4px;
+  padding: 8px 12px;
+  transition: background-color 0.2s ease;
+}
+
+.cart-item:hover {
+  background-color: #e9ecef;
 }
 
 .cart-backdrop {
@@ -586,4 +541,10 @@
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.4);
   z-index: 998;
+}
+
+/* Utility spacing for "my-3" (margin-y) */
+.my-3 {
+  margin-top: 1rem !important;
+  margin-bottom: 1rem !important;
 }
