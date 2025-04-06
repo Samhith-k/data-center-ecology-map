@@ -23,6 +23,18 @@ func main() {
 	http.HandleFunc("/alldatacenters", handlers.AllDataCentersHandler)
 	http.HandleFunc("/api/possible-datacenters", handlers.PossibleDataCenterHandler)
 	http.HandleFunc("/api/property-details", handlers.GetPropertyDetailsHandler)
+	http.HandleFunc("/cart/add", handlers.AddToCartHandler)
+	http.HandleFunc("/cart", handlers.GetCartHandler)
+	http.HandleFunc("/cart/item", handlers.DeleteCartItemHandler)
+	http.HandleFunc("/cart", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method == http.MethodDelete {
+			handlers.DeleteCartHandler(w, r)
+		} else if r.Method == http.MethodGet {
+			handlers.GetCartHandler(w, r) // your existing GET handler for /cart
+		} else {
+			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		}
+	})
 
 	fmt.Println("Starting server on :8080 ...")
 	log.Fatal(http.ListenAndServe(":8080", nil))

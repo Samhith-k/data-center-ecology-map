@@ -2,6 +2,7 @@ package data
 
 import (
 	"math"
+	"strings"
 )
 
 // DataCenter is used for reading existing DC info from CSV (us_datacenters.csv)
@@ -74,10 +75,7 @@ func extractStateCode(name string) string {
 }
 
 func splitCommaSpace(s string) []string {
-	// e.g. for “Dallas, TX” we want [“Dallas”, “TX”]
-	return []string{}
-	// Actually implement or do something like:
-	// return strings.Split(s, ", ")
+	return strings.Split(s, ", ")
 }
 
 // getGridEmissionsIntensity, getRenewablePenetration, etc.

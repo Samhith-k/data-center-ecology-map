@@ -1,0 +1,14 @@
+{
+  "username": "alice",
+  "items": [
+    {
+      "latitude": 39.0438,
+      "longitude": -77.4874,
+      "name": "AWS US East Region (Ashburn VA)",
+      "land_price": "1.5-2.5M per acre",
+      "electricity": "$0.06-0.08/kWh",
+      "notes": "AWS's largest and oldest region in Data Center Alley"
+    }
+  ],
+  "money_left": 750000
+}
