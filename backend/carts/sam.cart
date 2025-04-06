@@ -1,0 +1,22 @@
+{
+  "username": "sam",
+  "items": [
+    {
+      "latitude": 31.7619,
+      "longitude": -106.485,
+      "name": "El Paso, TX",
+      "land_price": "$80,000",
+      "electricity": "$0.0813/kWh",
+      "notes": "{notes:[\"Border Data Center presence"
+    },
+    {
+      "latitude": 38.0406,
+      "longitude": -84.5037,
+      "name": "Lexington, KY",
+      "land_price": "$80,000",
+      "electricity": "$0.0870/kWh",
+      "notes": "{notes:[\"University resources"
+    }
+  ],
+  "money_left": 840000
+}
