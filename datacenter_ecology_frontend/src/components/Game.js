@@ -101,7 +101,7 @@ function Game({ username, onLogout }) {
       console.log("Starting fetch of potential locations...");
       const response = await fetch('http://localhost:8080/api/possible-datacenters', {
         method: 'GET',
-        credentials: 'same-origin', // Change to 'same-origin' instead of 'include'
+        credentials: 'same-origin',
       });
       
       console.log("Response status:", response.status);
@@ -114,24 +114,34 @@ function Game({ username, onLogout }) {
       console.log("Potential locations received:", rawData);
       
       // Check if data is valid
-      if (!rawData || !Array.isArray(rawData)) {
-        throw new Error("Invalid data format received");
+      if (!rawData) {
+        throw new Error("No data received from server");
+      }
+      
+      // Handle non-array responses
+      const dataArray = Array.isArray(rawData) ? rawData : [rawData];
+      
+      // If array is empty, throw to use fallback
+      if (dataArray.length === 0) {
+        throw new Error("Empty data array received");
       }
       
       // Transform the raw data to the format needed for the map
-      const locations = rawData.map((dc, index) => ({
+      // Examining the raw data output you shared, it has latitude and longitude properties
+      const locations = dataArray.map((dc, index) => ({
         id: `potential-${index + 1}`,
         position: { 
-          lat: dc.latitude, 
-          lng: dc.longitude 
+          lat: dc.latitude || dc.Latitude || 0, 
+          lng: dc.longitude || dc.Longitude || 0 
         },
-        isPotential: true
+        isPotential: true // Flag to identify potential locations
       }));
       
       setPotentialLocations(locations);
     } catch (err) {
       console.error("Error fetching potential locations:", err);
-      // Use fallback data
+      // Use fallback potential locations data
+      console.log("Using fallback potential locations");
       setPotentialLocations([
         {
           id: "potential-1",
@@ -156,34 +166,71 @@ function Game({ username, onLogout }) {
   // Fetch available locations
   useEffect(() => {
     const fetchDataCenters = async () => {
-        try {
-          setIsLoading(true);
-          console.log("Fetching data centers...");
+      try {
+        setIsLoading(true);
+        console.log("Fetching data centers...");
+        
+        // Get data from the backend
+        const response = await fetch('http://localhost:8080/alldatacenters', {
+          method: 'GET',
+          credentials: 'same-origin',
+        });
+        
+        if (!response.ok) {
+          throw new Error(`Failed to fetch data centers: ${response.status}`);
+        }
+        
+        const rawData = await response.json();
+        console.log("Data centers received:", rawData);
+        
+        // Handle the possibility that rawData might be null or undefined
+        if (!rawData) {
+          throw new Error("No data received from server");
+        }
+        
+        // Convert rawData to an array if it's not already an array
+        let dataArray = Array.isArray(rawData) ? rawData : [];
+        
+        // If dataArray is empty, throw an error to use fallback data
+        if (dataArray.length === 0) {
+          throw new Error("Empty data array received");
+        }
+        
+        // Check for required properties in the first item
+        const firstItem = dataArray[0];
+        if (typeof firstItem.latitude === 'undefined' || typeof firstItem.longitude === 'undefined') {
+          console.warn("Data center format is different than expected, attempting to adapt");
           
-          const response = await fetch('http://localhost:8080/alldatacenters', {
-            method: 'GET',
-            credentials: 'same-origin', // Change to 'same-origin'
-          });
-          
-          if (!response.ok) {
-            throw new Error(`Failed to fetch data centers: ${response.status}`);
+          // Try to handle different data formats
+          if (typeof firstItem.Latitude !== 'undefined' && typeof firstItem.Longitude !== 'undefined') {
+            // Capital letter format (Go struct field naming)
+            dataArray = dataArray.map(dc => ({
+              id: dc.ID || Math.random().toString(36).substr(2, 9),
+              name: dc.Name || "Unknown Location",
+              latitude: dc.Latitude,
+              longitude: dc.Longitude
+            }));
+          } else if (typeof firstItem.position !== 'undefined') {
+            // Nested position format
+            dataArray = dataArray.map(dc => ({
+              id: dc.id || Math.random().toString(36).substr(2, 9),
+              name: dc.name || "Unknown Location",
+              latitude: dc.position.lat,
+              longitude: dc.position.lng
+            }));
+          } else {
+            // Can't determine format, throw error to use fallback
+            throw new Error("Unrecognized data center format");
           }
-          
-          const rawData = await response.json();
-          console.log("Data centers received:", rawData);
-          
-          // Check if data is valid
-          if (!rawData || !Array.isArray(rawData)) {
-            throw new Error("Invalid data format received");
-          }
-          
+        }
+        
         // Transform the raw data to the format needed for the map
-        const locations = rawData.map((dc, index) => ({
-          id: index + 1,
-          name: dc.name,
+        const locations = dataArray.map((dc, index) => ({
+          id: dc.id || index + 1,
+          name: dc.name || dc.Name || `Location ${index + 1}`,
           position: { 
-            lat: dc.latitude, 
-            lng: dc.longitude 
+            lat: dc.latitude || dc.Latitude || 0, 
+            lng: dc.longitude || dc.Longitude || 0
           }
         }));
         
@@ -191,10 +238,9 @@ function Game({ username, onLogout }) {
         setIsLoading(false);
       } catch (err) {
         console.error("Error fetching data centers:", err);
-        setError('Failed to load data center locations. Please try again later.');
-        setIsLoading(false);
+        // Use fallback data without showing a persistent error
+        console.log("Using fallback data centers instead");
         
-        // Use fallback data if API call fails
         setAvailableLocations([
           {
             id: 1,
@@ -222,9 +268,14 @@ function Game({ username, onLogout }) {
             position: {"lat": 65.6, "lng": 22.1}
           }
         ]);
+        
+        setIsLoading(false);
+        // Show error message for a few seconds, then clear it
+        setError('Using fallback data while connecting to server...');
+        setTimeout(() => setError(null), 3000);
       }
     };
-
+  
     fetchDataCenters();
     fetchPotentialLocations(); // Fetch potential locations
   }, []);
@@ -247,7 +298,7 @@ function Game({ username, onLogout }) {
           `http://localhost:8080/api/property-details?lat=${location.position.lat}&lng=${location.position.lng}`,
           {
             method: 'GET',
-            credentials: 'include',
+            credentials: 'same-origin',
           }
         );
         
@@ -255,13 +306,19 @@ function Game({ username, onLogout }) {
           throw new Error(`Failed to fetch property details: ${response.status}`);
         }
         
-        const propertyData = await response.json();
-        console.log("Property details:", propertyData);
+        let propertyData;
+        try {
+          propertyData = await response.json();
+          console.log("Property details:", propertyData);
+        } catch (error) {
+          console.error("Error parsing JSON response:", error);
+          throw new Error("Invalid JSON response from server");
+        }
         
         // Parse land price to extract numeric value
         let landCost = 3000000; // Default fallback
         try {
-          const priceText = propertyData.land_price || "";
+          const priceText = propertyData.land_price || propertyData.landPrice || "$3,000,000";
           const priceMatch = priceText.match(/\$([0-9,]+)/);
           if (priceMatch && priceMatch[1]) {
             landCost = parseInt(priceMatch[1].replace(/,/g, ''));
@@ -270,20 +327,37 @@ function Game({ username, onLogout }) {
           console.error("Error parsing land price:", e);
         }
         
-        // Create details object from the API response with more fields
+        // Get location name with fallbacks
+        const locationName = propertyData.location_name || 
+                            propertyData.locationName || 
+                            propertyData.name || 
+                            "Potential Location";
+        
+        // Create details object from the API response with more fields and fallbacks
         const details = {
-          name: propertyData.location_name || "Potential Location",
-          climate: Math.floor(Math.random() * 30) + 60,
+          name: locationName,
+          climate: Math.floor(Math.random() * 30) + 60, // If backend doesn't provide environmental metrics
           renewable: Math.floor(Math.random() * 40) + 40,
           grid: Math.floor(Math.random() * 40) + 40,
           risk: Math.floor(Math.random() * 20) + 70,
           land_cost: landCost,
-          electricity_cost: propertyData.electricity || "Unknown",
+          electricity_cost: propertyData.electricity || 
+                           propertyData.electricity_cost || 
+                           propertyData.electricityCost || 
+                           "Unknown",
           connectivity: propertyData.connectivity || "Standard",
-          water_availability: propertyData.water_availability || "Adequate",
-          tax_incentives: propertyData.tax_incentives || "None",
-          zone_type: propertyData.zone_type || "Industrial",
-          description: propertyData.notes || "A potential location for a new data center."
+          water_availability: propertyData.water_availability || 
+                             propertyData.waterAvailability || 
+                             "Adequate",
+          tax_incentives: propertyData.tax_incentives || 
+                         propertyData.taxIncentives || 
+                         "None",
+          zone_type: propertyData.zone_type || 
+                    propertyData.zoneType || 
+                    "Industrial",
+          description: propertyData.notes || 
+                      propertyData.description || 
+                      "A potential location for a new data center."
         };
         
         // Create enriched location object
@@ -335,7 +409,30 @@ function Game({ username, onLogout }) {
       setLocationLoading(false);
     } catch (error) {
       console.error("Error generating location details:", error);
-      setError("Failed to load location details");
+      
+      // Create basic location details for error handling
+      const fallbackDetails = {
+        name: location.name || "Unknown Location",
+        climate: 70,
+        renewable: 60,
+        grid: 65,
+        risk: 80,
+        land_cost: 3000000,
+        description: "Data about this location could not be loaded. Using fallback data."
+      };
+      
+      // Set a basic location so the user can still interact
+      setSelectedLocation({
+        ...location,
+        ...fallbackDetails
+      });
+      
+      // Show a notification instead of an error modal
+      setNotification({
+        type: 'error',
+        message: "Could not load full location details. Using fallback data."
+      });
+      
       setLocationLoading(false);
     }
   };
