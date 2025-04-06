@@ -24,7 +24,6 @@ func main() {
 	http.HandleFunc("/api/possible-datacenters", handlers.PossibleDataCenterHandler)
 	http.HandleFunc("/api/property-details", handlers.GetPropertyDetailsHandler)
 	http.HandleFunc("/cart/add", handlers.AddToCartHandler)
-	http.HandleFunc("/cart", handlers.GetCartHandler)
 	http.HandleFunc("/cart/item", handlers.DeleteCartItemHandler)
 	http.HandleFunc("/cart", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method == http.MethodDelete {
