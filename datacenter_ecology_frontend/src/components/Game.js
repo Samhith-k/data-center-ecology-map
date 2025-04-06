@@ -1,10 +1,9 @@
 // src/components/Game.js
 import React, { useState, useEffect } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './Game.css';
-import ApiService from '../services/api';
 
 // Fix for Leaflet marker icons
 delete L.Icon.Default.prototype._getIconUrl;
@@ -39,7 +38,6 @@ const builtIcon = new L.DivIcon({
   popupAnchor: [0, -7]
 });
 
-// New icon for potential data center locations
 const potentialLocationIcon = new L.DivIcon({
   className: 'custom-map-marker',
   html: `<div class="map-dot orange-dot"></div>`,
@@ -48,9 +46,23 @@ const potentialLocationIcon = new L.DivIcon({
   popupAnchor: [0, -7]
 });
 
+// A different icon if the item is in the cart
+const cartIcon = new L.DivIcon({
+  className: 'custom-map-marker',
+  html: `<div class="map-dot cart-dot"></div>`,
+  iconSize: [14, 14],
+  iconAnchor: [7, 7],
+  popupAnchor: [0, -7]
+});
+
 function Game({ username, onLogout }) {
+  // Cart state
+  const [cartItems, setCartItems] = useState([]);
+  const [showCart, setShowCart] = useState(false);
+
+  // Standard states
   const [availableLocations, setAvailableLocations] = useState([]);
-  const [potentialLocations, setPotentialLocations] = useState([]); // New state for potential locations
+  const [potentialLocations, setPotentialLocations] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState(null);
   const [builtDataCenters, setBuiltDataCenters] = useState([]);
   const [budget, setBudget] = useState(10000000);
@@ -95,7 +107,90 @@ function Game({ username, onLogout }) {
     }
   ];
 
-  // Fetch potential data center locations
+  //----------------------------------------------------
+  // CART FUNCTIONS
+  //----------------------------------------------------
+  // 1) Load the cart from backend
+  const fetchCart = async () => {
+    try {
+      const res = await fetch(`http://localhost:8080/cart?username=${username}`, {
+        method: 'GET',
+        credentials: 'include'
+      });
+      if (!res.ok) {
+        // Possibly 404 if no cart found, so just skip
+        console.log("No existing cart found, or error fetching cart.");
+        return;
+      }
+      const cartData = await res.json();
+      // cartData may have .items array
+      if (cartData && cartData.items) {
+        setCartItems(cartData.items);
+      } else {
+        // If the cart structure is "Items" capitalized, or something else, adapt here
+        setCartItems(cartData.Items || []);
+      }
+    } catch (err) {
+      console.error("Error loading cart:", err);
+    }
+  };
+
+  // 2) Add item to cart
+  const addToCart = async (location) => {
+    try {
+      let cost = location.land_cost || 100000;
+      const itemPayload = {
+        username: username,
+        item: {
+          latitude: location.position.lat,
+          longitude: location.position.lng,
+          name: location.name || "Untitled",
+          land_price: `$${cost.toLocaleString()}`,
+          electricity: location.electricity_cost || "$0.07/kWh",
+          notes: location.description || "Data center location"
+        },
+        cost: cost
+      };
+
+      const res = await fetch("http://localhost:8080/cart/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(itemPayload)
+      });
+      if (!res.ok) {
+        throw new Error(`Failed to add item: ${res.status}`);
+      }
+      console.log("Item added to cart:", location);
+      // Reload the cart
+      fetchCart();
+    } catch (err) {
+      console.error("Error adding to cart:", err);
+    }
+  };
+
+  // 3) Remove item from cart
+  const removeCartItem = async (index) => {
+    try {
+      // Call /cart/item?username=XYZ&index=N
+      const res = await fetch(`http://localhost:8080/cart/item?username=${username}&index=${index}`, {
+        method: "DELETE",
+        credentials: "include"
+      });
+      if (!res.ok) {
+        throw new Error(`Failed to remove cart item: ${res.status}`);
+      }
+      console.log("Item removed from cart at index:", index);
+      // Reload cart
+      fetchCart();
+    } catch (err) {
+      console.error("Error removing cart item:", err);
+    }
+  };
+
+  //----------------------------------------------------
+  // Existing fetch of data centers & potential locations
+  //----------------------------------------------------
   const fetchPotentialLocations = async () => {
     try {
       console.log("Starting fetch of potential locations...");
@@ -103,45 +198,37 @@ function Game({ username, onLogout }) {
         method: 'GET',
         credentials: 'same-origin',
       });
-      
+
       console.log("Response status:", response.status);
-      
+
       if (!response.ok) {
         throw new Error(`Failed to fetch potential locations: ${response.status}`);
       }
-      
+
       const rawData = await response.json();
       console.log("Potential locations received:", rawData);
-      
-      // Check if data is valid
+
       if (!rawData) {
         throw new Error("No data received from server");
       }
-      
-      // Handle non-array responses
       const dataArray = Array.isArray(rawData) ? rawData : [rawData];
-      
-      // If array is empty, throw to use fallback
       if (dataArray.length === 0) {
         throw new Error("Empty data array received");
       }
-      
-      // Transform the raw data to the format needed for the map
-      // Examining the raw data output you shared, it has latitude and longitude properties
+
       const locations = dataArray.map((dc, index) => ({
         id: `potential-${index + 1}`,
-        position: { 
-          lat: dc.latitude || dc.Latitude || 0, 
-          lng: dc.longitude || dc.Longitude || 0 
+        position: {
+          lat: dc.latitude || dc.Latitude || 0,
+          lng: dc.longitude || dc.Longitude || 0
         },
-        isPotential: true // Flag to identify potential locations
+        isPotential: true
       }));
-      
+
       setPotentialLocations(locations);
     } catch (err) {
       console.error("Error fetching potential locations:", err);
-      // Use fallback potential locations data
-      console.log("Using fallback potential locations");
+      // fallback
       setPotentialLocations([
         {
           id: "potential-1",
@@ -149,7 +236,7 @@ function Game({ username, onLogout }) {
           isPotential: true
         },
         {
-          id: "potential-2", 
+          id: "potential-2",
           position: { lat: 52.5200, lng: 13.4050 },
           isPotential: true
         },
@@ -161,49 +248,37 @@ function Game({ username, onLogout }) {
       ]);
     }
   };
-  
 
-  // Fetch available locations
   useEffect(() => {
     const fetchDataCenters = async () => {
       try {
         setIsLoading(true);
         console.log("Fetching data centers...");
-        
-        // Get data from the backend
+
         const response = await fetch('http://localhost:8080/alldatacenters', {
           method: 'GET',
           credentials: 'same-origin',
         });
-        
+
         if (!response.ok) {
           throw new Error(`Failed to fetch data centers: ${response.status}`);
         }
-        
+
         const rawData = await response.json();
         console.log("Data centers received:", rawData);
-        
-        // Handle the possibility that rawData might be null or undefined
+
         if (!rawData) {
           throw new Error("No data received from server");
         }
-        
-        // Convert rawData to an array if it's not already an array
         let dataArray = Array.isArray(rawData) ? rawData : [];
-        
-        // If dataArray is empty, throw an error to use fallback data
         if (dataArray.length === 0) {
           throw new Error("Empty data array received");
         }
-        
-        // Check for required properties in the first item
+
         const firstItem = dataArray[0];
         if (typeof firstItem.latitude === 'undefined' || typeof firstItem.longitude === 'undefined') {
           console.warn("Data center format is different than expected, attempting to adapt");
-          
-          // Try to handle different data formats
           if (typeof firstItem.Latitude !== 'undefined' && typeof firstItem.Longitude !== 'undefined') {
-            // Capital letter format (Go struct field naming)
             dataArray = dataArray.map(dc => ({
               id: dc.ID || Math.random().toString(36).substr(2, 9),
               name: dc.Name || "Unknown Location",
@@ -211,7 +286,6 @@ function Game({ username, onLogout }) {
               longitude: dc.Longitude
             }));
           } else if (typeof firstItem.position !== 'undefined') {
-            // Nested position format
             dataArray = dataArray.map(dc => ({
               id: dc.id || Math.random().toString(36).substr(2, 9),
               name: dc.name || "Unknown Location",
@@ -219,81 +293,79 @@ function Game({ username, onLogout }) {
               longitude: dc.position.lng
             }));
           } else {
-            // Can't determine format, throw error to use fallback
             throw new Error("Unrecognized data center format");
           }
         }
-        
-        // Transform the raw data to the format needed for the map
+
         const locations = dataArray.map((dc, index) => ({
           id: dc.id || index + 1,
           name: dc.name || dc.Name || `Location ${index + 1}`,
-          position: { 
-            lat: dc.latitude || dc.Latitude || 0, 
+          position: {
+            lat: dc.latitude || dc.Latitude || 0,
             lng: dc.longitude || dc.Longitude || 0
           }
         }));
-        
+
         setAvailableLocations(locations);
         setIsLoading(false);
       } catch (err) {
         console.error("Error fetching data centers:", err);
-        // Use fallback data without showing a persistent error
-        console.log("Using fallback data centers instead");
-        
+        // fallback
         setAvailableLocations([
           {
             id: 1,
             name: "Northern Virginia",
-            position: {"lat": 38.8, "lng": -77.2}
+            position: { lat: 38.8, lng: -77.2 }
           },
           {
             id: 2,
             name: "Oregon",
-            position: {"lat": 45.5, "lng": -122.5}
+            position: { lat: 45.5, lng: -122.5 }
           },
           {
             id: 3,
             name: "Iceland",
-            position: {"lat": 64.1, "lng": -21.9}
+            position: { lat: 64.1, lng: -21.9 }
           },
           {
             id: 4,
             name: "Singapore",
-            position: {"lat": 1.3, "lng": 103.8}
+            position: { lat: 1.3, lng: 103.8 }
           },
           {
             id: 5,
             name: "Northern Sweden",
-            position: {"lat": 65.6, "lng": 22.1}
+            position: { lat: 65.6, lng: 22.1 }
           }
         ]);
-        
+
         setIsLoading(false);
-        // Show error message for a few seconds, then clear it
         setError('Using fallback data while connecting to server...');
         setTimeout(() => setError(null), 3000);
       }
     };
-  
+
     fetchDataCenters();
-    fetchPotentialLocations(); // Fetch potential locations
+    fetchPotentialLocations();
   }, []);
 
-  // Calculate total environmental score for a location
+  // Once user logs in, load their cart
+  useEffect(() => {
+    fetchCart();
+  }, [username]);
+
+  // Helpers
   const calculateLocationScore = (location) => {
     if (!location || !location.climate) return 0;
     return (location.climate + location.renewable + location.grid + location.risk) / 4;
   };
-  
-  // Handle location selection on the map
+
   const handleLocationSelect = async (location) => {
     try {
       setLocationLoading(true);
-      
+
       if (location.isPotential) {
         // This is a potential location, fetch details from property-details endpoint
-        console.log("Fetching property details for:", location);
         const response = await fetch(
           `http://localhost:8080/api/property-details?lat=${location.position.lat}&lng=${location.position.lng}`,
           {
@@ -301,24 +373,22 @@ function Game({ username, onLogout }) {
             credentials: 'same-origin',
           }
         );
-        
+
         if (!response.ok) {
           throw new Error(`Failed to fetch property details: ${response.status}`);
         }
-        
+
         let propertyData;
         try {
           propertyData = await response.json();
-          console.log("Property details:", propertyData);
         } catch (error) {
           console.error("Error parsing JSON response:", error);
           throw new Error("Invalid JSON response from server");
         }
-        
-        // Parse land price to extract numeric value
-        let landCost = 3000000; // Default fallback
+
+        let landCost = 3000000;
         try {
-          const priceText = propertyData.land_price || propertyData.landPrice || "$3,000,000";
+          const priceText = propertyData.land_price || "$3,000,000";
           const priceMatch = priceText.match(/\$([0-9,]+)/);
           if (priceMatch && priceMatch[1]) {
             landCost = parseInt(priceMatch[1].replace(/,/g, ''));
@@ -326,91 +396,62 @@ function Game({ username, onLogout }) {
         } catch (e) {
           console.error("Error parsing land price:", e);
         }
-        
-        // Get location name with fallbacks
-        const locationName = propertyData.location_name || 
-                            propertyData.locationName || 
-                            propertyData.name || 
-                            "Potential Location";
-        
-        // Create details object from the API response with more fields and fallbacks
+
+        const locationName = propertyData.location_name || "Potential Location";
+
         const details = {
           name: locationName,
-          climate: Math.floor(Math.random() * 30) + 60, // If backend doesn't provide environmental metrics
+          climate: Math.floor(Math.random() * 30) + 60,
           renewable: Math.floor(Math.random() * 40) + 40,
           grid: Math.floor(Math.random() * 40) + 40,
           risk: Math.floor(Math.random() * 20) + 70,
           land_cost: landCost,
-          electricity_cost: propertyData.electricity || 
-                           propertyData.electricity_cost || 
-                           propertyData.electricityCost || 
-                           "Unknown",
+          electricity_cost: propertyData.electricity || "$0.07/kWh",
           connectivity: propertyData.connectivity || "Standard",
-          water_availability: propertyData.water_availability || 
-                             propertyData.waterAvailability || 
-                             "Adequate",
-          tax_incentives: propertyData.tax_incentives || 
-                         propertyData.taxIncentives || 
-                         "None",
-          zone_type: propertyData.zone_type || 
-                    propertyData.zoneType || 
-                    "Industrial",
-          description: propertyData.notes || 
-                      propertyData.description || 
-                      "A potential location for a new data center."
+          water_availability: propertyData.water_availability || "Adequate",
+          tax_incentives: propertyData.tax_incentives || "None",
+          zone_type: propertyData.zone_type || "Industrial",
+          description: propertyData.notes || "A potential location for a new data center."
         };
-        
-        // Create enriched location object
-        const enrichedLocation = {
-          ...location,
-          ...details
-        };
-        
-        // Add the previously selected location to recently viewed
+
+        const enrichedLocation = { ...location, ...details };
+
         if (selectedLocation && selectedLocation.id !== location.id) {
           setRecentlyViewedLocations(prev => {
-            // Only keep the last 3 viewed locations
             const newList = [selectedLocation, ...prev.filter(loc => loc.id !== selectedLocation.id)].slice(0, 3);
             return newList;
           });
         }
-        
+
         setSelectedLocation(enrichedLocation);
       } else {
-        // Regular existing location, generate metrics as before
+        // Regular existing location
         const details = {
-          climate: Math.floor(Math.random() * 30) + 60, // Random value between 60-90
-          renewable: Math.floor(Math.random() * 40) + 40, // Random value between 40-80
-          grid: Math.floor(Math.random() * 40) + 40, // Random value between 40-80
-          risk: Math.floor(Math.random() * 20) + 70, // Random value between 70-90
-          land_cost: Math.floor(Math.random() * 3000000) + 2000000, // Random cost
+          climate: Math.floor(Math.random() * 30) + 60,
+          renewable: Math.floor(Math.random() * 40) + 40,
+          grid: Math.floor(Math.random() * 40) + 40,
+          risk: Math.floor(Math.random() * 20) + 70,
+          land_cost: Math.floor(Math.random() * 3000000) + 2000000,
           description: `Data center located in ${location.name} with excellent connectivity to major networks.`
         };
-        
-        // Create a complete location object with the generated details
-        const enrichedLocation = {
-          ...location,
-          ...details
-        };
-        
-        // Add the previously selected location to recently viewed
+
+        const enrichedLocation = { ...location, ...details };
+
         if (selectedLocation && selectedLocation.id !== location.id) {
           setRecentlyViewedLocations(prev => {
-            // Only keep the last 3 viewed locations
             const newList = [selectedLocation, ...prev.filter(loc => loc.id !== selectedLocation.id)].slice(0, 3);
             return newList;
           });
         }
-        
+
         setSelectedLocation(enrichedLocation);
       }
-      
+
       setNotification(null);
       setLocationLoading(false);
     } catch (error) {
       console.error("Error generating location details:", error);
-      
-      // Create basic location details for error handling
+
       const fallbackDetails = {
         name: location.name || "Unknown Location",
         climate: 70,
@@ -420,31 +461,22 @@ function Game({ username, onLogout }) {
         land_cost: 3000000,
         description: "Data about this location could not be loaded. Using fallback data."
       };
-      
-      // Set a basic location so the user can still interact
-      setSelectedLocation({
-        ...location,
-        ...fallbackDetails
-      });
-      
-      // Show a notification instead of an error modal
+
+      setSelectedLocation({ ...location, ...fallbackDetails });
       setNotification({
         type: 'error',
         message: "Could not load full location details. Using fallback data."
       });
-      
       setLocationLoading(false);
     }
   };
-  
-  // Handle building construction
+
   const handleBuild = (building) => {
+    if (!selectedLocation) return;
     if (budget >= building.cost + selectedLocation.land_cost) {
-      // Calculate environmental impact
       const locationScore = calculateLocationScore(selectedLocation);
       const environmentalImpact = building.carbonImpact * (100 - locationScore) / 100;
-      
-      // Create new data center object
+
       const newDataCenter = {
         id: Date.now(),
         location: selectedLocation,
@@ -452,21 +484,18 @@ function Game({ username, onLogout }) {
         dayBuilt: day,
         score: locationScore * building.energyEfficiency / 10
       };
-      
-      // Update game state
+
       setBudget(prev => prev - (building.cost + selectedLocation.land_cost));
       setCarbonFootprint(prev => prev + environmentalImpact);
       setScore(prev => prev + newDataCenter.score);
       setDay(prev => prev + 30);
       setBuiltDataCenters(prev => [...prev, newDataCenter]);
-      
-      // Show notification
+
       setNotification({
         type: 'success',
         message: `Successfully built ${building.name} in ${selectedLocation.name}!`
       });
-      
-      // Reset selection after building
+
       setSelectedLocation(null);
     } else {
       setNotification({
@@ -476,7 +505,6 @@ function Game({ username, onLogout }) {
     }
   };
 
-  // Close notification
   const closeNotification = () => {
     setNotification(null);
   };
@@ -505,33 +533,33 @@ function Game({ username, onLogout }) {
       {/* Game Header */}
       <div className="game-header">
         <div className="game-title">Data Center Tycoon</div>
-        
+
         <div className="game-stats">
           <div className="stat">
             <span className="stat-icon">💰</span>
             <span className="stat-label">Budget:</span>
             <span className="stat-value">${budget.toLocaleString()}</span>
           </div>
-          
+
           <div className="stat">
             <span className="stat-icon">📊</span>
             <span className="stat-label">Score:</span>
             <span className="stat-value">{Math.round(score)}</span>
           </div>
-          
+
           <div className="stat">
             <span className="stat-icon">🏭</span>
             <span className="stat-label">Carbon:</span>
             <span className="stat-value">{carbonFootprint.toFixed(1)} MT</span>
           </div>
-          
+
           <div className="stat">
             <span className="stat-icon">📅</span>
             <span className="stat-label">Day:</span>
             <span className="stat-value">{day}</span>
           </div>
         </div>
-        
+
         <div className="user-controls">
           <span className="username">Welcome, {username}!</span>
           <button onClick={onLogout} className="logout-button">
@@ -539,7 +567,7 @@ function Game({ username, onLogout }) {
           </button>
         </div>
       </div>
-      
+
       {/* Main Game Area */}
       <div className="game-content">
         {/* World Map */}
@@ -548,21 +576,33 @@ function Game({ username, onLogout }) {
           <MapContainer center={[20, 0]} zoom={2} style={{ height: "500px", width: "100%" }}>
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              attribution='&copy; OpenStreetMap contributors'
             />
-            
-            {/* Available Locations */}
+
             {availableLocations.map(location => {
-              // Skip if a data center is already built here
+              // Check if built
               const isBuilt = builtDataCenters.some(dc => dc.location.id === location.id);
+              // Check if selected
               const isSelected = selectedLocation && selectedLocation.id === location.id;
-              
+              // Check if in cart
+              const isInCart = cartItems.some(
+                ci => parseFloat(ci.latitude) === location.position.lat &&
+                  parseFloat(ci.longitude) === location.position.lng
+              );
+
               if (!isBuilt) {
+                let markerIcon = availableIcon;
+                if (isSelected) {
+                  markerIcon = selectedIcon;
+                } else if (isInCart) {
+                  markerIcon = cartIcon; // a special color for cart
+                }
+
                 return (
-                  <Marker 
-                    key={location.id} 
+                  <Marker
+                    key={location.id}
                     position={[location.position.lat, location.position.lng]}
-                    icon={isSelected ? selectedIcon : availableIcon}
+                    icon={markerIcon}
                     eventHandlers={{
                       click: () => handleLocationSelect(location)
                     }}
@@ -570,8 +610,8 @@ function Game({ username, onLogout }) {
                     <Popup>
                       <div>
                         <h3>{location.name}</h3>
-                        <button 
-                          className="map-select-btn"
+                        <button
+                          className="map-select-btn btn btn-sm btn-info"
                           onClick={() => handleLocationSelect(location)}
                         >
                           View Details
@@ -583,16 +623,27 @@ function Game({ username, onLogout }) {
               }
               return null;
             })}
-            
-            {/* Potential Locations */}
+
             {potentialLocations.map(location => {
               const isSelected = selectedLocation && selectedLocation.id === location.id;
-              
+              // check cart
+              const isInCart = cartItems.some(
+                ci => parseFloat(ci.latitude) === location.position.lat &&
+                  parseFloat(ci.longitude) === location.position.lng
+              );
+
+              let markerIcon = potentialLocationIcon;
+              if (isSelected) {
+                markerIcon = selectedIcon;
+              } else if (isInCart) {
+                markerIcon = cartIcon;
+              }
+
               return (
-                <Marker 
-                  key={location.id} 
+                <Marker
+                  key={location.id}
                   position={[location.position.lat, location.position.lng]}
-                  icon={isSelected ? selectedIcon : potentialLocationIcon}
+                  icon={markerIcon}
                   eventHandlers={{
                     click: () => handleLocationSelect(location)
                   }}
@@ -600,8 +651,8 @@ function Game({ username, onLogout }) {
                   <Popup>
                     <div>
                       <h3>Potential Location</h3>
-                      <button 
-                        className="map-select-btn"
+                      <button
+                        className="map-select-btn btn btn-sm btn-info"
                         onClick={() => handleLocationSelect(location)}
                       >
                         View Details
@@ -611,11 +662,10 @@ function Game({ username, onLogout }) {
                 </Marker>
               );
             })}
-            
-            {/* Built Data Centers */}
+
             {builtDataCenters.map(dataCenter => (
-              <Marker 
-                key={dataCenter.id} 
+              <Marker
+                key={dataCenter.id}
                 position={[dataCenter.location.position.lat, dataCenter.location.position.lng]}
                 icon={builtIcon}
               >
@@ -632,7 +682,7 @@ function Game({ username, onLogout }) {
             ))}
           </MapContainer>
         </div>
-        
+
         {/* Info Panel */}
         <div className="info-panel">
           {locationLoading ? (
@@ -643,55 +693,55 @@ function Game({ username, onLogout }) {
           ) : selectedLocation ? (
             <>
               <h2>{selectedLocation.name}</h2>
-              
+
               {/* Environment Metrics */}
               <div className="metrics-container">
                 <h3>Environmental Analysis</h3>
-                
+
                 <div className="metric">
                   <div className="metric-label">
                     <span className="metric-icon climate">🌡️</span>
                     <span>Climate Suitability</span>
                   </div>
                   <div className="metric-bar">
-                    <div className="metric-fill" style={{width: `${selectedLocation.climate}%`}}></div>
+                    <div className="metric-fill" style={{ width: `${selectedLocation.climate}%` }}></div>
                   </div>
                   <span className="metric-value">{selectedLocation.climate}%</span>
                 </div>
-                
+
                 <div className="metric">
                   <div className="metric-label">
                     <span className="metric-icon renewable">🔆</span>
                     <span>Renewable Potential</span>
                   </div>
                   <div className="metric-bar">
-                    <div className="metric-fill" style={{width: `${selectedLocation.renewable}%`}}></div>
+                    <div className="metric-fill" style={{ width: `${selectedLocation.renewable}%` }}></div>
                   </div>
                   <span className="metric-value">{selectedLocation.renewable}%</span>
                 </div>
-                
+
                 <div className="metric">
                   <div className="metric-label">
                     <span className="metric-icon grid">⚡</span>
                     <span>Grid Cleanliness</span>
                   </div>
                   <div className="metric-bar">
-                    <div className="metric-fill" style={{width: `${selectedLocation.grid}%`}}></div>
+                    <div className="metric-fill" style={{ width: `${selectedLocation.grid}%` }}></div>
                   </div>
                   <span className="metric-value">{selectedLocation.grid}%</span>
                 </div>
-                
+
                 <div className="metric">
                   <div className="metric-label">
                     <span className="metric-icon risk">⚠️</span>
                     <span>Disaster Safety</span>
                   </div>
                   <div className="metric-bar">
-                    <div className="metric-fill" style={{width: `${selectedLocation.risk}%`}}></div>
+                    <div className="metric-fill" style={{ width: `${selectedLocation.risk}%` }}></div>
                   </div>
                   <span className="metric-value">{selectedLocation.risk}%</span>
                 </div>
-                
+
                 <div className="metric-summary">
                   <div>
                     <span>Overall Rating:</span>
@@ -702,21 +752,18 @@ function Game({ username, onLogout }) {
                     <span className="cost">${selectedLocation.land_cost.toLocaleString()}</span>
                   </div>
                 </div>
-                
+
                 <p className="location-description">{selectedLocation.description}</p>
               </div>
-              
-              {/* Property Details Section - Add this after the Environmental Analysis section */}
+
               {selectedLocation.isPotential && (
                 <div className="property-details">
                   <h3>Property Details</h3>
-                  
                   <div className="detail-item">
                     <span className="detail-icon">🏢</span>
                     <span className="detail-label">Location Name:</span>
                     <span className="detail-value">{selectedLocation.name}</span>
                   </div>
-                  
                   {selectedLocation.electricity_cost && (
                     <div className="detail-item">
                       <span className="detail-icon">⚡</span>
@@ -724,7 +771,6 @@ function Game({ username, onLogout }) {
                       <span className="detail-value">{selectedLocation.electricity_cost}</span>
                     </div>
                   )}
-                  
                   {selectedLocation.connectivity && (
                     <div className="detail-item">
                       <span className="detail-icon">🌐</span>
@@ -732,14 +778,12 @@ function Game({ username, onLogout }) {
                       <span className="detail-value">{selectedLocation.connectivity}</span>
                     </div>
                   )}
-                  
-                  <button 
+                  <button
                     className="toggle-details-btn"
                     onClick={() => setShowFullDetails(prev => !prev)}
                   >
                     {showFullDetails ? 'Show Less Details' : 'Show More Details'}
                   </button>
-                  
                   {showFullDetails && (
                     <>
                       {selectedLocation.water_availability && (
@@ -749,7 +793,6 @@ function Game({ username, onLogout }) {
                           <span className="detail-value">{selectedLocation.water_availability}</span>
                         </div>
                       )}
-                      
                       {selectedLocation.tax_incentives && (
                         <div className="detail-item">
                           <span className="detail-icon">📋</span>
@@ -757,7 +800,6 @@ function Game({ username, onLogout }) {
                           <span className="detail-value">{selectedLocation.tax_incentives}</span>
                         </div>
                       )}
-                      
                       {selectedLocation.zone_type && (
                         <div className="detail-item">
                           <span className="detail-icon">🏗️</span>
@@ -769,8 +811,8 @@ function Game({ username, onLogout }) {
                   )}
                 </div>
               )}
-              
-              {/* Location Comparison - Add this section */}
+
+              {/* Recently Viewed Comparison */}
               {recentlyViewedLocations.length > 0 && (
                 <div className="location-comparison">
                   <h3>Location Comparison</h3>
@@ -810,27 +852,24 @@ function Game({ username, onLogout }) {
                   </div>
                 </div>
               )}
-              
+
               {/* Building Options */}
               <div className="building-options">
                 <h3>Select Facility Type</h3>
-                
                 {buildingOptions.map(building => {
                   const totalCost = building.cost + selectedLocation.land_cost;
                   const canAfford = budget >= totalCost;
-                  
+
                   return (
-                    <div 
-                      key={building.id} 
+                    <div
+                      key={building.id}
                       className={`building-option ${!canAfford ? 'disabled' : ''}`}
                     >
                       <div className="building-header">
                         <h4>{building.name}</h4>
                         <span className="building-cost">${building.cost.toLocaleString()}</span>
                       </div>
-                      
                       <p className="building-description">{building.description}</p>
-                      
                       <div className="building-specs">
                         <div className="spec">
                           <span>Efficiency:</span>
@@ -845,13 +884,11 @@ function Game({ username, onLogout }) {
                           <span>{building.carbonImpact} MT CO₂/day</span>
                         </div>
                       </div>
-                      
                       <div className="total-cost">
                         <span>Total Cost:</span>
                         <span>${totalCost.toLocaleString()}</span>
                       </div>
-                      
-                      <button 
+                      <button
                         className="build-button"
                         onClick={() => handleBuild(building)}
                         disabled={!canAfford}
@@ -862,12 +899,21 @@ function Game({ username, onLogout }) {
                   );
                 })}
               </div>
+
+              {/* Add to Cart Button */}
+              <div className="my-3">
+                <button
+                  className="btn btn-sm btn-success"
+                  onClick={() => addToCart(selectedLocation)}
+                >
+                  Add to Cart
+                </button>
+              </div>
             </>
           ) : (
             <div className="empty-state">
               <h3>Select a Location</h3>
               <p>Click on a blue marker on the map to view location details and build a data center.</p>
-              
               <div className="game-instructions">
                 <h3>How to Play</h3>
                 <ol>
@@ -877,7 +923,6 @@ function Game({ username, onLogout }) {
                   <li>Optimize your network for low carbon impact and high efficiency</li>
                   <li>Balance costs with environmental impact to maximize your score</li>
                 </ol>
-                
                 <div className="game-goal">
                   <h4>Goal</h4>
                   <p>Build the most efficient and environmentally friendly global data center network while managing your budget wisely.</p>
@@ -888,7 +933,7 @@ function Game({ username, onLogout }) {
           )}
         </div>
       </div>
-      
+
       {/* Notification */}
       {notification && (
         <div className={`game-notification ${notification.type}`}>
@@ -896,6 +941,55 @@ function Game({ username, onLogout }) {
           <button onClick={closeNotification} className="notification-close">×</button>
         </div>
       )}
+
+      {/* CART BUTTON (bottom-right) */}
+      <button
+        className="btn btn-primary cart-toggle-button"
+        onClick={() => setShowCart(true)}
+      >
+        Cart
+      </button>
+
+      {/* CART SIDEBAR */}
+      {showCart && (
+        <div className="cart-sidebar">
+          <div className="cart-header d-flex justify-content-between align-items-center">
+            <h4>Your Cart</h4>
+            <button
+              className="close-cart-btn btn btn-sm btn-danger"
+              onClick={() => setShowCart(false)}
+            >
+              &times;
+            </button>
+          </div>
+          <div className="cart-body mt-3">
+            {cartItems.length === 0 ? (
+              <p>No items in cart.</p>
+            ) : (
+              cartItems.map((item, idx) => (
+                <div
+                  key={idx}
+                  className="cart-item d-flex justify-content-between align-items-center mb-2"
+                >
+                  <div>
+                    <strong>{item.name}</strong>
+                    <div className="text-muted">
+                      {item.land_price} | {item.electricity}
+                    </div>
+                  </div>
+                  <button
+                    className="btn btn-outline-danger btn-sm"
+                    onClick={() => removeCartItem(idx)}
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      )}
+      {showCart && <div className="cart-backdrop" onClick={() => setShowCart(false)}></div>}
     </div>
   );
 }

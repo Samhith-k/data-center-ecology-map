@@ -1,6 +1,7 @@
 // src/App.js
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css'; // <-- Import Bootstrap
 import Login from './components/Login';
 import Register from './components/Register';
 import Game from './components/Game';
@@ -11,7 +12,7 @@ function App() {
   const [user, setUser] = useState(null);
   const [showRegister, setShowRegister] = useState(false);
   const [loading, setLoading] = useState(true);
-  
+
   // Check if user is already logged in when app loads
   useEffect(() => {
     const checkLoginStatus = async () => {
@@ -21,7 +22,7 @@ function App() {
         const message = profileData.profile || "";
         const usernameMatch = message.match(/Hello ([^!]+)!/);
         const username = usernameMatch ? usernameMatch[1] : "User";
-        
+
         setUser({ username });
       } catch (error) {
         console.log('User not logged in:', error);
@@ -30,18 +31,18 @@ function App() {
         setLoading(false);
       }
     };
-    
+
     checkLoginStatus();
   }, []);
-  
+
   const handleLogin = (userData) => {
     setUser({ username: userData });
   };
-  
+
   const handleRegister = (userData) => {
     setUser({ username: userData.username });
   };
-  
+
   const handleLogout = async () => {
     try {
       await ApiService.logout();
@@ -52,15 +53,15 @@ function App() {
       setUser(null);
     }
   };
-  
+
   const switchToRegister = () => {
     setShowRegister(true);
   };
-  
+
   const switchToLogin = () => {
     setShowRegister(false);
   };
-  
+
   // Show loading state
   if (loading) {
     return (
@@ -70,7 +71,7 @@ function App() {
       </div>
     );
   }
-  
+
   // If not logged in, show login or register page
   if (!user) {
     if (showRegister) {
@@ -79,7 +80,7 @@ function App() {
       return <Login onLogin={handleLogin} onSwitchToRegister={switchToRegister} />;
     }
   }
-  
+
   // If logged in, show the game
   return (
     <div className="App">
