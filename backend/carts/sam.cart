@@ -2,69 +2,13 @@
   "username": "sam",
   "items": [
     {
-      "latitude": 33.4918,
-      "longitude": -80.8556,
-      "name": "Orangeburg, SC",
-      "land_price": "$30,000",
-      "electricity": "$0.0904/kWh",
-      "notes": "{notes:[\"Central SC"
-    },
-    {
-      "latitude": 40.8158,
-      "longitude": -96.7127,
-      "name": "Lincoln (Downtown), NE",
-      "land_price": "$80,000",
-      "electricity": "$0.0870/kWh",
-      "notes": "{notes:[\"State government"
-    },
-    {
-      "latitude": 43.1572,
-      "longitude": -77.6152,
-      "name": "Rochester, NY",
-      "land_price": "$100,000",
-      "electricity": "$0.1460/kWh",
-      "notes": "{notes:[\"Western NY"
-    },
-    {
-      "latitude": 45.9182,
-      "longitude": -119.3249,
-      "name": "Umatilla, OR",
+      "latitude": 38.3498,
+      "longitude": -81.6326,
+      "name": "Charleston, WV",
       "land_price": "$50,000",
-      "electricity": "$0.0801/kWh",
-      "notes": "{notes:[\"Amazon US-West presence"
-    },
-    {
-      "latitude": 37.8043,
-      "longitude": -81.1895,
-      "name": "Beckley, WV",
-      "land_price": "$30,000",
       "electricity": "$0.0858/kWh",
-      "notes": "{notes:[\"Southern WV"
-    },
-    {
-      "latitude": 33.4918,
-      "longitude": -80.8556,
-      "name": "Orangeburg, SC",
-      "land_price": "$30,000",
-      "electricity": "$0.0904/kWh",
-      "notes": "{notes:[\"Central SC"
-    },
-    {
-      "latitude": 44.3683,
-      "longitude": -98.2186,
-      "name": "Huron, SD",
-      "land_price": "$25,000",
-      "electricity": "$0.0894/kWh",
-      "notes": "{notes:[\"Central SD"
-    },
-    {
-      "latitude": 43.5726,
-      "longitude": -72.2387,
-      "name": "Lebanon, NH",
-      "land_price": "$100,000",
-      "electricity": "$0.1729/kWh",
-      "notes": "{notes:[\"Dartmouth College"
+      "notes": "{notes:[\"Charleston Data Solutions presence"
     }
   ],
-  "money_left": 555000
+  "money_left": 950000
 }

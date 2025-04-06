@@ -576,7 +576,7 @@ function Game({ username, onLogout }) {
     <div className="game-container">
       {/* Game Header */}
       <div className="game-header">
-        <div className="game-title">Data Center Tycoon</div>
+        <div className="game-title">EcoGrid Tycoon</div>
 
         <div className="game-stats">
           <div className="stat">
@@ -616,7 +616,7 @@ function Game({ username, onLogout }) {
       <div className="game-content">
         {/* World Map */}
         <div className="world-map">
-          <h2>Global Data Center Map</h2>
+          <h2>US Data Center Map</h2>
           <MapContainer center={[37.0902, -95.7129]} zoom={4} style={{ height: "500px", width: "100%" }}>
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
