@@ -1,6 +1,5 @@
 // src/components/Game.js
 import React, { useState, useEffect } from 'react';
-import SimulationModal from './SimulationModal';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -617,7 +616,7 @@ function Game({ username, onLogout }) {
         {/* World Map */}
         <div className="world-map">
           <h2>Global Data Center Map</h2>
-          <MapContainer center={[20, 0]} zoom={2} style={{ height: "500px", width: "100%" }}>
+          <MapContainer center={[37.0902, -95.7129]} zoom={4} style={{ height: "500px", width: "100%" }}>
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               attribution='&copy; OpenStreetMap contributors'
